@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table>
+        <form action="" method="post">
+            <tr>
+                <td>Select the hall:</td>
+                <td>
+                    <select name="halls" id="halls" required>
+                        <option value="" disabled selected>Chose</option>
+                        {% for data in datas %}
+                        <option value="{{data.hallName}}">{{data.hallName}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Hall type: <span id="showType"></span></td>
+            </tr>
+            <tr>
+                <td>Starting time:</td>
+                <td><input type="time" name="sttime" min="8:30" max="16:00"></td>
+            </tr>
+            <tr>
+                <td>End time:</td>
+                <td><input type="time" name="endtime" minlength="9:30" maxlength="17:00"></td>
+            </tr>
+            <tr>
+                <td><input type="submit" value="Book the hall"></td>
+                <td><input type="reset" value="Reset"></td>
+            </tr>
+            
+        </form>
+    </table>
+
+    <script>
+        const hallselect = document.getElementById('halls')
+        const showType = document.getElementById('showType')
+
+        hallselect.addEventListener('change',function(){
+            const selectedHall = hallselect.value;
+             
+        })
+
+    </script>
+</body>
+</html>
