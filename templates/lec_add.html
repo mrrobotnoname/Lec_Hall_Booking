@@ -23,12 +23,13 @@
             <tr>
                 <td>Department:</td>
                <td>
-                <select name="depatment" id="department">
-                    <option value="1">IT</option>
-                    <option value="2">PM</option>
-                    <option value="3">English</option>
-                    <option value="4">Acount</option>
+                <select name="department">
+                    <option value="" disabled>Select Department</option>
+                    {% for department in departments %}
+                        <option value="{{ department.id }}">{{ department.name }}</option>
+                    {% endfor %}
                 </select>
+                    
                </td>
             </tr>
             <tr>

@@ -1,0 +1,136 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+.selection-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+}
+
+.back-button {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    text-decoration: none;
+    color: #3498db;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s;
+}
+
+.back-button:hover {
+    color: #2980b9;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-top: 10px;
+    text-align: center;
+    padding-top: 10px;
+    margin-bottom: 30px;
+}
+
+h2 {
+    color: #34495e;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.hall-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.hall-section:last-child {
+    border-bottom: none;
+}
+
+.hall-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+}
+
+.hall-btn {
+    padding: 12px 0;
+    border: 2px solid #dfe6e9;
+    border-radius: 6px;
+    background-color: white;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.hall-btn:hover {
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.hall-btn.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.selection-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.selection-display {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.selection-display p {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.selection-display span {
+    font-weight: 600;
+    color: #2980b9;
+}
+
+.next-button {
+    padding: 12px 24px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.next-button:hover {
+    background-color: #2980b9;
+}
+
+.next-button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}

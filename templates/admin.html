@@ -3,10 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='/css/admin.css') }}">
+    <style>
+        .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; margin-bottom: 10px; }
+        .flash-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; padding: 10px; margin-bottom: 10px; }
+        .flash-warning { background-color: #fff3cd; color: #85640a; border: 1px solid #ffeeba; padding: 10px; margin-bottom: 10px; }
+        .flash-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 10px; }
+        .flash-message { background-color: #eee; color: #333; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+    </style>
 </head>
 <body>
-    <a href="{{url_for('lecture_edit')}}">Lectures hadeling</a>
-    <a href="{{url_for('hall_edit')}}">Lecture Hall hadeling</a>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+        {% for category, message in messages %}
+          <div class="flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <h1>Manage Department</h1>
+    <div class="form-container">
+        <table>
+            <tr>
+                <th>Add Department</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="" method="post">
+                        <input type="hidden" name="action" value="add_department">
+                        <label for="facultyName">Department Name:</label>
+                        <input type="text" id="facultyName" name="name" required><br><br>
+                        <input type="submit" value="Add Faculty">
+                    </form>
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>Delete Faculty</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="" method="post">
+                        <input type="hidden" name="action" value="delete_department">
+                        <label for="deleteFaculty">Select Department to Delete:</label>
+                        <select id="deleteFaculty" name="department" required>
+                            <option value="" disabled selected>Select the Hall</option>
+                            {% for department in departments %}
+                            <option value="{{department.id}}">{{department.department_name}}</option>
+                            {% endfor %}
+                        </select><br><br>
+                        <input type="submit" value="Delete Faculty">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <h1>Manage Year</h1>
+    <div class="form-container">
+        <table>
+            <tr>
+                <th>Add Year</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="" method="post">
+                        <input type="hidden" name="action" value="add_year">
+                        <label for="selectFaculty">Select Faculty:</label>
+                        <select id="selectFaculty" name="department" required>
+                            {% for department in departments %}
+                            <option value="{{department.id}}">{{department.department_name}}</option>
+                            {% endfor %}
+                        </select><br><br>
+                        <label for="year">Year:</label>
+                        <input type="number" id="year" name="year" required><br><br>
+                        <input type="submit" value="Add Year">
+                    </form>
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>Delete Year</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="/admin" method="post">
+                        <input type="hidden" name="action" value="delete_year">
+                        <label for="deleteYearFaculty">Select Faculty:</label>
+                        <select id="deleteYearFaculty" name="faculty" required>
+                            <!-- Options should be dynamically generated from the server-side -->
+                        </select><br><br>
+                        <label for="deleteYear">Select Year to Delete:</label>
+                        <select id="deleteYear" name="year" required>
+                            <!-- Options should be dynamically generated from the server-side -->
+                        </select><br><br>
+                        <input type="submit" value="Delete Year">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <h1>Manage Hall</h1>
+    <div class="form-container">
+        <table>
+            <tr>
+                <th>Add Hall</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="/admin" method="post">
+                        <input type="hidden" name="action" value="add_hall">
+                        <label for="hallName">Hall Name:</label>
+                        <input type="text" id="hallName" name="name" required>
+                        <select name="hallType" id="">
+                            <option value="" disabled selected>Select Hall Type</option>
+                            <option value="Lecture Hall">Lecture Hall</option>
+                            <option value="Laboratory">Laboratory</option>
+                        </select><br><br>
+                        <input type="submit" value="Add Hall">
+                    </form>
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>Delete Hall</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="/admin" method="post">
+                        <input type="hidden" name="action" value="delete_hall">
+                        <label for="deleteHall">Select Hall to Delete:</label>
+                        <select id="deleteHall" name="hall" required>
+                            <!-- Options should be dynamically generated from the server-side -->
+                        </select><br><br>
+                        <input type="submit" value="Delete Hall">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <h1>Manage Times</h1>
+    <div class="form-container">
+        <table>
+            <tr>
+                <th>Add Time</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="/admin" method="post">
+                        <input type="hidden" name="action" value="add_time">
+                        <label for="timeName">Time Name:</label>
+                        <input type="text" id="timeName" name="name" required><br><br>
+                        <input type="submit" value="Add Time">
+                    </form>
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>Delete Time</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="/admin" method="post">
+                        <input type="hidden" name="action" value="delete_time">
+                        <label for="deleteTime">Select Time to Delete:</label>
+                        <select id="deleteTime" name="time" required>
+                            <!-- Options should be dynamically generated from the server-side -->
+                        </select><br><br>
+                        <input type="submit" value="Delete Time">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <h1>Manage User</h1>
+    <div class="form-container">
+        <table>
+            <tr>
+                <th>Add Teacher</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="/admin" method="post">
+                        <input type="hidden" name="action" value="add_teacher">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required><br><br>
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" required><br><br>
+                        <input type="submit" value="Add Teacher">
+                    </form>
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>Delete Teacher</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action="/admin" method="post">
+                        <input type="hidden" name="action" value="delete_teacher">
+                        <label for="deleteTeacher">Select Teacher to Delete:</label>
+                        <input type="text" id="deleteTeacher" name="username" required><br><br>
+                        <br><br>
+                        <input type="submit" value="Delete Teacher">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
 </body>
 </html>

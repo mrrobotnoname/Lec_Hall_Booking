@@ -1,0 +1,16 @@
+.form-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.form-container table {
+    width: 48%;
+    border-collapse: collapse;
+}
+.form-container th, .form-container td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+.form-container th {
+    background-color: #f2f2f2;
+}
