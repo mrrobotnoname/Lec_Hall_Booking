@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Department | Lecture Hall Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/department.css">
+</head>
+<body>
+    <div class="container">
+        <div class="back-button">
+            <a href="index.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Back to Quick Book
+            </a>
+        </div>
+
+        <div class="page-header">
+            <h1>Select Your Department</h1>
+            <p>Choose from our available departments</p>
+        </div>
+
+        <div class="department-grid">
+            <!-- IT Department -->
+            <div class="department-card" onclick="selectDepartment('IT')">
+                <div class="department-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <h3>Information Technology</h3>
+                <p>Computer labs and tech-equipped halls</p>
+                <div class="hall-count">8 Halls Available</div>
+            </div>
+
+            <!-- Project Management Department -->
+            <div class="department-card" onclick="selectDepartment('Project Management')">
+                <div class="department-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3>Project Management</h3>
+                <p>Collaborative workspaces</p>
+                <div class="hall-count">5 Halls Available</div>
+            </div>
+
+            <!-- English Department -->
+            <div class="department-card" onclick="selectDepartment('English')">
+                <div class="department-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>English</h3>
+                <p>Lecture halls for language studies</p>
+                <div class="hall-count">6 Halls Available</div>
+            </div>
+
+            <!-- Accountancy Department -->
+            <div class="department-card" onclick="selectDepartment('Accountancy')">
+                <div class="department-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3>Accountancy</h3>
+                <p>Halls with presentation facilities</p>
+                <div class="hall-count">4 Halls Available</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectDepartment(department) {
+            // Store the selected department (you can use localStorage or sessionStorage)
+            sessionStorage.setItem('selectedDepartment', department);
+            
+            // Redirect back to main page or to next step
+            window.location.href = 'index.html';
+            
+            // In a real implementation, you might want to:
+            // 1. Update the main page with the selected department
+            // 2. Proceed to the next booking step
+            // 3. Filter available halls based on department
+        }
+    </script>
+</body>
+</html>

@@ -6,11 +6,14 @@
     <title>Admin Panel</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='/css/admin.css') }}">
     <style>
-        .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; margin-bottom: 10px; }
-        .flash-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; padding: 10px; margin-bottom: 10px; }
-        .flash-warning { background-color: #fff3cd; color: #85640a; border: 1px solid #ffeeba; padding: 10px; margin-bottom: 10px; }
-        .flash-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 10px; }
-        .flash-message { background-color: #eee; color: #333; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+  .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 15px; margin-bottom: 15px; position: absolute; right: 0;top: 10px; opacity: 1; transition: opacity 0.3s ease-in-out; }
+  .flash-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; padding: 15px; margin-bottom: 15px; position: absolute;right: 0;top: 10px; opacity: 1; transition: opacity 0.3s ease-in-out; }
+  .flash-warning { background-color: #fff3cd; color: #85640a; border: 1px solid #ffeeba; padding: 15px; margin-bottom: 15px; position: absolute;right: 0;top: 10px; opacity: 1; transition: opacity 0.3s ease-in-out; }
+  .flash-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 15px; margin-bottom: 15px; position: absolute;right: 0;top: 10px; opacity: 1; transition: opacity 0.3s ease-in-out; }
+  .flash-message { background-color: #eee; color: #333; border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; position: absolute;right: 0;top: 10px; opacity: 1; transition: opacity 0.3s ease-in-out; }
+  .close-btn { position: relative; top: 0px; right: 0px; cursor: pointer; border: none; background: none; font-size: 1.2em; line-height: 1; color: inherit; opacity: 0.7; }
+  .close-btn:hover { opacity: 1; }
+  .fade-out { opacity: 0; transition: opacity 0.3s ease-in-out; }
     </style>
 </head>
 <body>
@@ -18,12 +21,13 @@
       {% if messages %}
         <div class="flashes">
         {% for category, message in messages %}
-          <div class="flash-{{ category }}">{{ message }}</div>
+          <div class="flash-{{ category }}">{{ message }} <button type="button" class="close-btn" onclick="closeFlashMessage(this)">&times;</button> </div>
         {% endfor %}
         </div>
       {% endif %}
     {% endwith %}
     <h1>Manage Department</h1>
+    <a href="{{ url_for('logout') }}">Logout</a>
     <div class="form-container">
         <table>
             <tr>
@@ -42,7 +46,7 @@
         </table>
         <table>
             <tr>
-                <th>Delete Faculty</th>
+                <th>Delete Department</th>
             </tr>
             <tr>
                 <td>
@@ -50,7 +54,7 @@
                         <input type="hidden" name="action" value="delete_department">
                         <label for="deleteFaculty">Select Department to Delete:</label>
                         <select id="deleteFaculty" name="department" required>
-                            <option value="" disabled selected>Select the Hall</option>
+                            <option value="" disabled selected>Select the Department</option>
                             {% for department in departments %}
                             <option value="{{department.id}}">{{department.department_name}}</option>
                             {% endfor %}
@@ -72,8 +76,8 @@
                 <td>
                     <form action="" method="post">
                         <input type="hidden" name="action" value="add_year">
-                        <label for="selectFaculty">Select Faculty:</label>
-                        <select id="selectFaculty" name="department" required>
+                        <label for="department">Select Department:</label>
+                        <select id="department" name="department" required>
                             {% for department in departments %}
                             <option value="{{department.id}}">{{department.department_name}}</option>
                             {% endfor %}
@@ -93,14 +97,17 @@
                 <td>
                     <form action="/admin" method="post">
                         <input type="hidden" name="action" value="delete_year">
-                        <label for="deleteYearFaculty">Select Faculty:</label>
-                        <select id="deleteYearFaculty" name="faculty" required>
-                            <!-- Options should be dynamically generated from the server-side -->
-                        </select><br><br>
-                        <label for="deleteYear">Select Year to Delete:</label>
-                        <select id="deleteYear" name="year" required>
-                            <!-- Options should be dynamically generated from the server-side -->
-                        </select><br><br>
+                        <label for="deleteYearDepartment">Select Department:</label>
+                            <select id="deleteYearDepartment" name="faculty" required>
+                                <option value="" selected disabled>Select the Department</option>
+                                {% for department in departments %}
+                                <option value="{{department.id}}">{{department.department_name}}</option>
+                                {% endfor %}
+                            </select><br><br>
+                            <label for="deleteYear">Select Year to Delete:</label>
+                            <select id="deleteYear" name="year" required>
+                                <option value="" disabled selected>Select The Year</option>
+                            </select><br><br>
                         <input type="submit" value="Delete Year">
                     </form>
                 </td>
@@ -120,9 +127,9 @@
                         <input type="hidden" name="action" value="add_hall">
                         <label for="hallName">Hall Name:</label>
                         <input type="text" id="hallName" name="name" required>
-                        <select name="hallType" id="">
-                            <option value="" disabled selected>Select Hall Type</option>
-                            <option value="Lecture Hall">Lecture Hall</option>
+                        <label for="hallName">Hall Type</label>
+                        <select name="hallType" required>
+                            <option value="Lecture Hall" selected>Lecture Hall</option>
                             <option value="Laboratory">Laboratory</option>
                         </select><br><br>
                         <input type="submit" value="Add Hall">
@@ -139,8 +146,8 @@
                     <form action="/admin" method="post">
                         <input type="hidden" name="action" value="delete_hall">
                         <label for="deleteHall">Select Hall to Delete:</label>
-                        <select id="deleteHall" name="hall" required>
-                            <!-- Options should be dynamically generated from the server-side -->
+                        <select id="deleteHall" name="deleteHall" required>
+                            <option value="" disabled selected>Select The Hall</option>
                         </select><br><br>
                         <input type="submit" value="Delete Hall">
                     </form>
@@ -148,58 +155,23 @@
             </tr>
         </table>
     </div>
-
-    <h1>Manage Times</h1>
-    <div class="form-container">
-        <table>
-            <tr>
-                <th>Add Time</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="/admin" method="post">
-                        <input type="hidden" name="action" value="add_time">
-                        <label for="timeName">Time Name:</label>
-                        <input type="text" id="timeName" name="name" required><br><br>
-                        <input type="submit" value="Add Time">
-                    </form>
-                </td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <th>Delete Time</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="/admin" method="post">
-                        <input type="hidden" name="action" value="delete_time">
-                        <label for="deleteTime">Select Time to Delete:</label>
-                        <select id="deleteTime" name="time" required>
-                            <!-- Options should be dynamically generated from the server-side -->
-                        </select><br><br>
-                        <input type="submit" value="Delete Time">
-                    </form>
-                </td>
-            </tr>
-        </table>
-    </div>
-
     <h1>Manage User</h1>
     <div class="form-container">
         <table>
             <tr>
-                <th>Add Teacher</th>
+                <th>Add Lecture</th>
             </tr>
             <tr>
                 <td>
                     <form action="/admin" method="post">
-                        <input type="hidden" name="action" value="add_teacher">
+                        <input type="hidden" name="action" value="add_lecture">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required><br><br>
                         <label for="username">Username:</label>
                         <input type="text" id="username" name="username" required><br><br>
                         <label for="password">Password:</label>
                         <input type="password" id="password" name="password" required><br><br>
-                        <input type="submit" value="Add Teacher">
+                        <input type="submit" value="Add Lecture">
                     </form>
                 </td>
             </tr>
@@ -221,6 +193,41 @@
             </tr>
         </table>
     </div>
+
+    <script>
+        function closeFlashMessage(element) {
+            element.parentNode.classList.add('fade-out');
+            setTimeout(function() {
+                element.parentNode.style.display = 'none';
+          }, 300);
+        }
+        document.querySelectorAll('.flash-message').forEach(function(message) {
+            message.querySelector('.close-btn').addEventListener('click', function() {
+                message.classList.add('fade-out');
+                setTimeout(function() {
+                    message.remove();
+                }, 300);
+            });
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+         $(document).ready(function() {
+            $('#deleteYearDepartment').change(function() {
+                var faculty = $(this).val();
+                $.ajax({
+                    url: '/api?action=getYears&faculty=' + faculty,
+                    method: 'GET',
+                    success: function(years) {
+                        $('#deleteYear').empty();
+                        years.forEach(function(year) {
+                            $('#deleteYear').append(new Option(year, year));
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>
