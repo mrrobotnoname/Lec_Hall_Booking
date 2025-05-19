@@ -178,25 +178,12 @@ def api():
       years = Year.query.filter_by(department_id = int(request.args['faculty'])).all()
       return [year.year for year in years]     
 
-@app.route('/bookings',methods = ['GET', 'POST'])
-def bookings():
-   if 'user' not in session and session.get('user') is None:
-      return redirect(url_for('login'))
-   elif session.get('user_level',1) != 1:
-      abort(401)
-   else:
-      if request.method == "POST":
-         hall = request.form.get('hall')
-         year = request.form.get('year')
-         start_time = request.form.get('start_time')
-         end_time = request.form.get('end_time')
-         booking_session = str(datetime.now())
-         add = Booking(booking_session=booking_session,user_id=session['user'],hall_id=hall,year_id=year,start_time=start_time,end_time=end_time)
-         db.session.add(add)
-         db.session.commit()
-         flash("Booking has been added successfully!",category="success")
-         return redirect(url_for("bookings"))
-      return render_template("bookings.html")
+@app.route('/selectdepartment')
+def selectDepartment():
+   datas = Department.query.all()
+   return render_template('department.html',datas=datas)
+   
+   
 @app.route('/logout')
 def logout():
    session.pop('user',None)

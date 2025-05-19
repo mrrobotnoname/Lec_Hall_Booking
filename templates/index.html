@@ -39,9 +39,9 @@
             <h1>LEC-Hall <br> Reserve</h1>
             <p>A dedicated space for your academic and professional gatherings, <br> tailored to meet your every need !!!</p>
             {% if not lec_user %}
-            <a href="{{ url_for('login') }}" class="home-btn">View Bookings </a>
+            <a href="{{ url_for('selectDepartment') }}" class="home-btn">View Bookings </a>
             {% else %}
-            <a href="{{ url_for('login') }}" class="home-btn">Book Now </a>
+            <a href="{{ url_for('selectDepartment') }}" class="home-btn">Book Now </a>
             {% endif %}
             </div>
     </section>
