@@ -182,7 +182,13 @@ def api():
 def selectDepartment():
    datas = Department.query.all()
    return render_template('department.html',datas=datas)
-   
+@app.route('/selectyear')
+def selectYear():
+   if request.get_data(as_text=True) is None:
+      return 'No action specified', 400
+   print(request.get_data(as_text=True))
+   years = Year.query.filter_by(department_id=request.get_data(as_text=True)).all()
+   return render_template('year.html',years=years)
    
 @app.route('/logout')
 def logout():

@@ -24,7 +24,7 @@
             <!-- IT Department -->
             {% for data in datas %}
 
-            <div class="department-card" onclick="selectDepartment('{{ data.department_name }}')">
+            <div class="department-card" onclick="selectDepartment('{{ data.department_id }}')">
                 <div class="department-icon">
                     <i class="fa-regular fa-building"></i>
                 </div>
@@ -32,35 +32,6 @@
                 <p>Select The Department</p>
             </div>
             {% endfor %}
-            <!-- Project Management Department -->
-            <!-- <div class="department-card" onclick="selectDepartment('Project Management')">
-                <div class="department-icon">
-                    <i class="fas fa-project-diagram"></i>
-                </div>
-                <h3>Project Management</h3>
-                <p>Collaborative workspaces</p>
-                <div class="hall-count">5 Halls Available</div>
-            </div> -->
-
-            <!-- English Department -->
-            <!-- <div class="department-card" onclick="selectDepartment('English')">
-                <div class="department-icon">
-                    <i class="fas fa-book-open"></i>
-                </div>
-                <h3>English</h3>
-                <p>Lecture halls for language studies</p>
-                <div class="hall-count">6 Halls Available</div>
-            </div> -->
-
-            <!-- Accountancy Department -->
-            <!-- <div class="department-card" onclick="selectDepartment('Accountancy')">
-                <div class="department-icon">
-                    <i class="fas fa-calculator"></i>
-                </div>
-                <h3>Accountancy</h3>
-                <p>Halls with presentation facilities</p>
-                <div class="hall-count">4 Halls Available</div>
-            </div> -->
         </div>
     </div>
 
@@ -68,14 +39,17 @@
         function selectDepartment(department) {
             // Store the selected department (you can use localStorage or sessionStorage)
             sessionStorage.setItem('selectedDepartment', department);
-            
+            fetch("{{ url_for('selectYear') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain"
+                },
+                body: department
+            });
             // Redirect back to main page or to next step
-            window.location.href = "{{ url_for('root')}}";
+            window.location.href = "{{ url_for('selectYear')}}";
             
-            // In a real implementation, you might want to:
-            // 1. Update the main page with the selected department
-            // 2. Proceed to the next booking step
-            // 3. Filter available halls based on department
+        
         }
     </script>
 </body>
