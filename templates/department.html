@@ -3,54 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Department | Lecture Hall Booking</title>
+    <title>Select Department</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static',filename='/css/department.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        /* Custom styles for the selected card */
+        .department-card.selected {
+            border-color: #3b82f6; /* Blue border for selected */
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2), 0 4px 6px -2px rgba(59, 130, 246, 0.1); /* Blue shadow */
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <div class="back-button">
-            <a href="{{ url_for('root')}}" class="btn btn-outline">
-                <i class="fas fa-arrow-left"></i> Back to Quick Book
-            </a>
-        </div>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
-        <div class="page-header">
-            <h1>Select Your Department</h1>
-            <p>Choose from our available departments</p>
-        </div>
+    <form action="" method="post" class="bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Select Your Department</h1>
+        <p class="text-center text-gray-600 mb-8">Choose from our available departments</p>
 
-        <div class="department-grid">
-            <!-- IT Department -->
-            {% for data in datas %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {% for department in departments %}
+            <input type="radio" name="faculty" id="{{department.id}}" value="{{department.id}}" class="hidden">
 
-            <div class="department-card" onclick="selectDepartment('{{ data.department_id }}')">
-                <div class="department-icon">
-                    <i class="fa-regular fa-building"></i>
+            <label for="{{department.id}}" class="department-card cursor-pointer block p-6 border-2 border-gray-200 rounded-xl transition-all duration-300 ease-in-out hover:border-blue-400 hover:shadow-md flex flex-col items-center text-center">
+                <div class="text-blue-500 text-5xl mb-4">
+                    {% if department.department_name == "Information Technology" %}
+                        <i class="fas fa-laptop-code"></i>
+                    {% elif department.department_name == "Project Management" %}
+                        <i class="fas fa-project-diagram"></i>
+                    {% elif department.department_name == "English" %}
+                        <i class="fas fa-book-open"></i>
+                    {% elif department.department_name == "Accountancy" %}
+                        <i class="fas fa-calculator"></i>
+                    {% else %}
+                        <i class="fas fa-building"></i>
+                    {% endif %}
                 </div>
-                <h3>{{ data.department_name }}</h3>
-                <p>Select The Department</p>
-            </div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">{{department.department_name}}</h2>
+                <p class="text-sm text-gray-600 mb-4">
+                    {% if department.department_name == "Information Technology" %}
+                        Computer labs and tech-equipped halls
+                    {% elif department.department_name == "Project Management" %}
+                        Collaborative workspaces
+                    {% elif department.department_name == "English" %}
+                        Lecture halls for language studies
+                    {% elif department.department_name == "Accountancy" %}
+                        Halls with presentation facilities
+                    {% else %}
+                        Diverse learning environments
+                    {% endif %}
+                </p>
+                <a href="#" class="text-blue-500 text-sm font-medium hover:underline">
+                    {% if department.department_name == "Information Technology" %}
+                        8 Halls Available
+                    {% elif department.department_name == "Project Management" %}
+                        5 Halls Available
+                    {% elif department.department_name == "English" %}
+                        6 Halls Available
+                    {% elif department.department_name == "Accountancy" %}
+                        4 Halls Available
+                    {% else %}
+                        X Halls Available
+                    {% endif %}
+                </a>
+            </label>
             {% endfor %}
         </div>
-    </div>
 
-    <script>
-        function selectDepartment(department) {
-            // Store the selected department (you can use localStorage or sessionStorage)
-            sessionStorage.setItem('selectedDepartment', department);
-            fetch("{{ url_for('selectYear') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/plain"
+        <div class="mb-6 text-center">
+            <label for="deleteYear" class="block text-gray-700 text-sm font-medium mb-2">Select The Year</label>
+            <select id="deleteYear" name="year" required class="block w-full max-w-xs mx-auto p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <option value="" disabled selected>Select The Year</option>
+            </select>
+        </div>
+
+        <div class="text-center">
+            <input type="submit" value="Submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 cursor-pointer shadow-md">
+        </div>
+    </form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Handle card click to select radio button and apply styling
+        $('.department-card').on('click', function() {
+            // Remove 'selected' class from all cards
+            $('.department-card').removeClass('selected');
+            // Add 'selected' class to the clicked card
+            $(this).addClass('selected');
+
+            // Get the ID of the radio button associated with this card
+            var radioId = $(this).attr('for');
+            // Check the corresponding hidden radio button
+            $('#' + radioId).prop('checked', true);
+
+            // Trigger the change event on the radio button to run the AJAX call
+            $('#' + radioId).trigger('change');
+        });
+
+        // Original AJAX call, now triggered by the card click (via radio button change)
+        $('input[name="faculty"]').change(function() {
+            var faculty = $(this).val();
+            console.log("Selected Faculty ID:", faculty); // Log the selected faculty ID for debugging
+            $.ajax({
+                url: '/api?action=getYears&faculty=' + faculty,
+                method: 'GET',
+                success: function(years) {
+                    $('#deleteYear').empty();
+                    // Add the default disabled option back
+                    $('#deleteYear').append($('<option>', {
+                        value: '',
+                        text: 'Select The Year',
+                        disabled: true,
+                        selected: true
+                    }));
+                    if (years && years.length > 0) {
+                        years.forEach(function(year) {
+                            $('#deleteYear').append(new Option(year, year));
+                        });
+                    } else {
+                        console.log("No years found for this faculty.");
+                        // Optionally, add a message if no years are returned
+                        // $('#deleteYear').append($('<option>', {
+                        //     value: '',
+                        //     text: 'No years available',
+                        //     disabled: true
+                        // }));
+                    }
                 },
-                body: department
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", status, error);
+                    // Handle error, e.g., show an error message to the user
+                    // alert("Failed to load years. Please try again.");
+                }
             });
-            // Redirect back to main page or to next step
-            window.location.href = "{{ url_for('selectYear')}}";
-            
-        
-        }
-    </script>
+        });
+
+        // Optional: Pre-select a card if a faculty is already checked on page load
+        $('input[name="faculty"]:checked').each(function() {
+            var radioId = $(this).attr('id');
+            $('label[for="' + radioId + '"]').addClass('selected');
+            // Also trigger the change to load years if a faculty is pre-selected
+            $(this).trigger('change');
+        });
+    });
+</script>
+
 </body>
 </html>

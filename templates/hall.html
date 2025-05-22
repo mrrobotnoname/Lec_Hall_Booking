@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture Hall Selection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hall.css') }}">
+</head>
+<body>
+    <div class="selection-container">
+        <a href="time.html" class="back-button">← Back To Time Slot</a>
+        
+        <h1>Select Lecture Hall</h1>
+        
+        <div class="hall-section">
+            <h2>A Building</h2>
+            <div class="hall-options">
+                <button class="hall-btn" data-hall="A1">A1</button>
+                <button class="hall-btn" data-hall="A2">A2</button>
+                <button class="hall-btn" data-hall="A3">A3</button>
+                <button class="hall-btn" data-hall="A4">A4</button>
+                <button class="hall-btn" data-hall="A5">A5</button>
+                <button class="hall-btn" data-hall="A6">A6</button>
+                <button class="hall-btn" data-hall="A7">A7</button>
+            </div>
+        </div>
+        
+        <div class="hall-section">
+            <h2>B Building</h2>
+            <div class="hall-options">
+                <button class="hall-btn" data-hall="B1">B1</button>
+                <button class="hall-btn" data-hall="B2">B2</button>
+                <button class="hall-btn" data-hall="B3">B3</button>
+                <button class="hall-btn" data-hall="B4">B4</button>
+                <button class="hall-btn" data-hall="B5">B5</button>
+                <button class="hall-btn" data-hall="B6">B6</button>
+                <button class="hall-btn" data-hall="B7">B7</button>
+            </div>
+        </div>
+        
+        <div class="hall-section">
+            <h2>Laboratories</h2>
+            <div class="hall-options">
+                <button class="hall-btn" data-hall="Lab1">Lab 1</button>
+                <button class="hall-btn" data-hall="Lab2">Lab 2</button>
+                <button class="hall-btn" data-hall="Lab3">Lab 3</button>
+            </div>
+        </div>
+        
+        <div class="selection-footer">
+            <div class="selection-display">
+                <p>Selected Hall: <span id="selected-hall">None</span></p>
+            </div>
+            <a href="final.html" id="next-button" class="next-button" disabled>Next</a>
+        </div>
+    </div>
+
+ <script type="text/javascript" src="{{ url_for('static',filename='js/hall.js') }} "></script>
+</body>
+</html>

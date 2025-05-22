@@ -175,20 +175,27 @@ def api():
    if request.args.get('action') is None:
       return 'No action specified', 400
    if request.args['action'] == 'getYears':
-      years = Year.query.filter_by(department_id = int(request.args['faculty'])).all()
+      years = Year.query.filter_by(department_id = int(request.args.get('faculty'))).all()
       return [year.year for year in years]     
 
-@app.route('/selectdepartment')
-def selectDepartment():
-   datas = Department.query.all()
-   return render_template('department.html',datas=datas)
-@app.route('/selectyear')
-def selectYear():
-   if request.get_data(as_text=True) is None:
-      return 'No action specified', 400
-   print(request.get_data(as_text=True))
-   years = Year.query.filter_by(department_id=request.get_data(as_text=True)).all()
-   return render_template('year.html',years=years)
+@app.route('/department',methods = ['GET', 'POST'])
+def department():
+   departments = Department.query.all()
+   if request.method == "POST":
+      session['selected_department'] = request.form.get('faculty')
+      session['selected_year'] = request.form.get('year')
+      return redirect(url_for('selecthall'))
+   return render_template('department.html',departments=departments)
+@app.route('/selecthall',methods = ['GET', 'POST'])
+def selecthall():
+   halls = Hall.query.all()
+   if 'selected_department' not in session and session.get('selected_department') is None:
+      return redirect(url_for('department'))
+   else:
+      if 'user' not in session and session.get('user_level',2) != 1:
+         return redirect(url_for('viewbooking'))
+      return render_template('hall.html',halls=halls)
+   
    
 @app.route('/logout')
 def logout():

@@ -39,15 +39,15 @@
             <h1>LEC-Hall <br> Reserve</h1>
             <p>A dedicated space for your academic and professional gatherings, <br> tailored to meet your every need !!!</p>
             {% if not lec_user %}
-            <a href="{{ url_for('selectDepartment') }}" class="home-btn">View Bookings </a>
+            <a href="{{ url_for('department') }}" class="home-btn">View Bookings </a>
             {% else %}
-            <a href="{{ url_for('selectDepartment') }}" class="home-btn">Book Now </a>
+            <a href="{{ url_for('department') }}" class="home-btn">Book Now </a>
             {% endif %} 
             </div>
     </section>
 
     <!--Quick Book LH Section-->
-    <section class="container">
+    <!-- <section class="container">
         <div class="text">
             <h2> <a href="back"></a>Quick Book <br> a Lecture Hall!</h2>
             
@@ -91,7 +91,7 @@
                 <a href="hall.html" class="box-btn">Find Halls</a>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!--Available LH section-->
     <section class="lecture hall" id="lecture halls">
@@ -169,43 +169,7 @@
         </div>
     </section>
 
-    <!--department section-->
-    <section class="departments" id="departments">
-        <div class="title">
-            <h2>Departments That <br> Drive Excellence!</h2>
-            <br><br>
-        </div>
 
-        <div class="destination-content">
-            <div class="row">
-                <div class="col-content">
-                    <img src="static/assests/Gallery/IT.jpg">
-                    <h5>Department of IT</h5>
-                    <p>"Empowering the future through digital innovation..."</p>
-                </div>
-
-                <div class="col-content">
-                    <img src="static/assests/Gallery/PM.jpeg">
-                    <h5>Department of project Management</h5>
-                    <p>"Turning ideas into impactful realities..."
-                    </p>
-                </div>
-
-                <div class="col-content">
-                    <img src="static/assests/Gallery/English.jpeg">
-                    <h5>Department of English</h5>
-                    <p>"Inspiring expression, communication, and creativity..."</p>
-                </div>
-
-                <div class="col-content">
-                    <img src="static/assests/Gallery/Acc.jpeg">
-                    <h5>Department of Accountancy</h5>
-                    <p>"Shaping financial minds for tomorrow's economy..."</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
     <!-- Upcoming Bookings section -->
     <section class="bookings" id="bookings">
         <div class="title">
@@ -267,6 +231,43 @@
         </div>
     </section>
 
+    <!--department section-->
+    <section class="departments" id="departments">
+        <div class="title">
+            <h2>Departments That <br> Drive Excellence!</h2>
+            <br><br>
+        </div>
+
+        <div class="destination-content">
+            <div class="row">
+                <div class="col-content">
+                    <img src="static/assests/Gallery/IT.jpg">
+                    <h5>Department of IT</h5>
+                    <p>"Empowering the future through digital innovation..."</p>
+                </div>
+
+                <div class="col-content">
+                    <img src="static/assests/Gallery/PM.jpeg">
+                    <h5>Department of project Management</h5>
+                    <p>"Turning ideas into impactful realities..."
+                    </p>
+                </div>
+
+                <div class="col-content">
+                    <img src="static/assests/Gallery/English.jpeg">
+                    <h5>Department of English</h5>
+                    <p>"Inspiring expression, communication, and creativity..."</p>
+                </div>
+
+                <div class="col-content">
+                    <img src="static/assests/Gallery/Acc.jpeg">
+                    <h5>Department of Accountancy</h5>
+                    <p>"Shaping financial minds for tomorrow's economy..."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
      <!--newsletter-->
      <section class="newsletter">
         <div class="news-text">
