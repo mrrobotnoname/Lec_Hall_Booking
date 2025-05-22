@@ -189,12 +189,22 @@ def department():
 @app.route('/selecthall',methods = ['GET', 'POST'])
 def selecthall():
    halls = Hall.query.all()
+   if request.method == "POST":
+         session['selected_hall'] = request.form.get('hall')
+         return redirect(url_for('selectDatetime'))
    if 'selected_department' not in session and session.get('selected_department') is None:
       return redirect(url_for('department'))
    else:
       if 'user' not in session and session.get('user_level',2) != 1:
          return redirect(url_for('viewbooking'))
       return render_template('hall.html',halls=halls)
+@app.route('/selectdatetime')
+def selectDatetime():
+   if 'user' not in session and session.get('user') is None:
+      return redirect(url_for('root'))
+   if session.get('selected_department') and session.get('selected_hall') is None:
+      return redirect(url_for('department'))
+   return render_template('datetime.html')
    
    
 @app.route('/logout')

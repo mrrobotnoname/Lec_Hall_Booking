@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Date & Time | Lecture Hall Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        /* Custom styles for calendar cells */
+        .date-cell {
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-weight: 500;
+        }
+        .date-cell:hover:not(.empty):not(.past-date):not(.selected) {
+            background-color: #e0f2fe; /* Light blue on hover */
+            color: #1e40af; /* Darker blue text */
+        }
+        .date-cell.empty {
+            background-color: transparent;
+            cursor: default;
+        }
+        .date-cell.past-date {
+            color: #9ca3af; /* Gray out past dates */
+            cursor: not-allowed;
+            background-color: #f9fafb;
+        }
+        .date-cell.today {
+            border: 2px solid #3b82f6; /* Blue border for today */
+            background-color: #dbeafe; /* Lighter blue background */
+        }
+        .date-cell.selected {
+            background-color: #3b82f6; /* Solid blue for selected */
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
+        }
+        /* Style for disabled next button */
+        .next-button.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="container bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl">
+        <div class="back-button mb-6">
+            <a href="index.html" class="btn btn-outline text-blue-600 hover:text-blue-800 text-sm font-medium">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Quick Book
+            </a>
+        </div>
+
+        <div class="page-header text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Select Booking Date & Time</h1>
+            <p class="text-gray-600">Choose your preferred date and time for the booking</p>
+        </div>
+
+        <div class="date-selector-container mb-10">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Date Selection</h2>
+            <div class="month-navigator flex justify-between items-center bg-gray-100 p-3 rounded-lg mb-4">
+                <button class="nav-btn p-2 text-gray-700 hover:bg-gray-200 rounded-full" id="prev-month">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h3 class="current-month text-lg font-semibold text-gray-800">September 2023</h3>
+                <button class="nav-btn p-2 text-gray-700 hover:bg-gray-200 rounded-full" id="next-month">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="day-names grid grid-cols-7 text-center font-semibold text-gray-500 mb-2">
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+            </div>
+
+            <div class="date-grid grid grid-cols-7 gap-2" id="date-grid">
+                </div>
+        </div>
+
+        <div class="time-selector-container border-t border-gray-200 pt-8 mt-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Time Selection</h2>
+            <p class="time-range-info text-center text-gray-600 mb-6">Available time: 8:00 AM to 6:00 PM</p>
+            
+            <div class="time-input-group flex flex-col sm:flex-row justify-center items-center gap-6 mb-8">
+                <div class="time-input flex flex-col items-center">
+                    <label for="start-time" class="block text-gray-700 text-sm font-medium mb-2">Start Time:</label>
+                    <input type="time" id="start-time" name="start-time" min="08:00" max="18:00" required
+                           class="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto">
+                </div>
+                
+                <div class="time-input flex flex-col items-center">
+                    <label for="end-time" class="block text-gray-700 text-sm font-medium mb-2">End Time:</label>
+                    <input type="time" id="end-time" name="end-time" min="08:00" max="18:00" required
+                           class="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto">
+                </div>
+            </div>
+            
+            <div class="time-footer flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div id="time-selection-display" class="time-display text-center sm:text-left">
+                    <p class="text-gray-700">Selected Date: <span id="selected-date-display" class="font-semibold text-blue-600">None</span></p>
+                    <p class="text-gray-700">Selected Time: <span id="selected-time-range" class="font-semibold text-blue-600">Not selected</span></p>
+                    <p class="text-gray-700">Duration: <span id="duration-display" class="font-semibold text-blue-600">0 minutes</span></p>
+                </div>
+                <div class="date-actions flex flex-col sm:flex-row gap-4">
+                    <button class="btn btn-outline bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-300" id="clear-selection">
+                        <i class="fas fa-times mr-2"></i> Clear Selection
+                    </button>
+                    <a href="hall.html" class="btn btn-primary bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 next-button disabled" id="next-button">
+                        <i class="far fa-calendar-check mr-2"></i> Next
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/datetime.js"></script>
+</body>
+</html>

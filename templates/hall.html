@@ -4,57 +4,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture Hall Selection</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/hall.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        /* Custom styles for selected hall button */
+        .hall-btn.selected {
+            background-color: #3b82f6; /* Blue background for selected */
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
+        }
+        /* Style for disabled next button */
+        .next-button.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
 </head>
-<body>
-    <div class="selection-container">
-        <a href="time.html" class="back-button">← Back To Time Slot</a>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="selection-container bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl">
+        <a href="date.html" class="back-button text-blue-600 hover:text-blue-800 text-sm font-medium mb-6 inline-block">← Back To Date & Time Selection</a>
         
-        <h1>Select Lecture Hall</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Select Lecture Hall</h1>
         
-        <div class="hall-section">
-            <h2>A Building</h2>
-            <div class="hall-options">
-                <button class="hall-btn" data-hall="A1">A1</button>
-                <button class="hall-btn" data-hall="A2">A2</button>
-                <button class="hall-btn" data-hall="A3">A3</button>
-                <button class="hall-btn" data-hall="A4">A4</button>
-                <button class="hall-btn" data-hall="A5">A5</button>
-                <button class="hall-btn" data-hall="A6">A6</button>
-                <button class="hall-btn" data-hall="A7">A7</button>
+        <form id="hallSelectionForm" action="" method="post">
+            <input type="hidden" name="selectedHallId" id="selectedHallId">
+            <input type="hidden" name="selectedDate" id="selectedDateInput">
+            <input type="hidden" name="startTime" id="startTimeInput">
+            <input type="hidden" name="endTime" id="endTimeInput">
+
+            <div id="halls-container">
+                {# Initialize a dictionary to group halls by derived building name #}
+                {% set grouped_halls = {} %}
+
+                {# Loop through all halls passed from the backend #}
+                {% for hall in halls %}
+                    {# Filter by status: only include halls where status is False (available) #}
+                    {% if hall.status == False %}
+                        {# Derive building name from hallName #}
+                        {% set building_prefix = hall.hallName[0] %}
+                        {% if building_prefix == 'L' %}
+                            {% set building_name = 'Laboratories' %}
+                        {% else %}
+                            {% set building_name = building_prefix + ' Building' %}
+                        {% endif %}
+
+                        {# Add hall to the appropriate building group #}
+                        {% if building_name not in grouped_halls %}
+                            {% set _ = grouped_halls.update({building_name: []}) %}
+                        {% endif %}
+                        {% set _ = grouped_halls[building_name].append(hall) %}
+                    {% endif %}
+                {% endfor %}
+
+                {# Now, loop through the prepared grouped_halls to display them #}
+                {% if grouped_halls %}
+                    {% for building, halls_in_building in grouped_halls.items() %}
+                        <div class="hall-section mb-6">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ building }}</h2>
+                            <div class="hall-options grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                                {% for hall in halls_in_building %}
+                                    <button type="button" class="hall-btn px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 hover:border-blue-400 transition-all duration-200 ease-in-out" data-hall-id="{{ hall.id }}" data-hall-name="{{ hall.hallName }}">
+                                        {{ hall.hallName }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-gray-500 text-lg">No available halls found for booking.</p>
+                {% endif %}
             </div>
-        </div>
-        
-        <div class="hall-section">
-            <h2>B Building</h2>
-            <div class="hall-options">
-                <button class="hall-btn" data-hall="B1">B1</button>
-                <button class="hall-btn" data-hall="B2">B2</button>
-                <button class="hall-btn" data-hall="B3">B3</button>
-                <button class="hall-btn" data-hall="B4">B4</button>
-                <button class="hall-btn" data-hall="B5">B5</button>
-                <button class="hall-btn" data-hall="B6">B6</button>
-                <button class="hall-btn" data-hall="B7">B7</button>
+            
+            <div class="selection-footer flex justify-between items-center mt-8 pt-4 border-t border-gray-200">
+                <div class="selection-display">
+                    <p class="text-gray-700">Selected Hall: <span id="selected-hall" class="font-semibold text-blue-600">None</span></p>
+                </div>
+                <button type="submit" id="next-button" class="next-button bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 cursor-not-allowed opacity-50" disabled>Next</button>
             </div>
-        </div>
-        
-        <div class="hall-section">
-            <h2>Laboratories</h2>
-            <div class="hall-options">
-                <button class="hall-btn" data-hall="Lab1">Lab 1</button>
-                <button class="hall-btn" data-hall="Lab2">Lab 2</button>
-                <button class="hall-btn" data-hall="Lab3">Lab 3</button>
-            </div>
-        </div>
-        
-        <div class="selection-footer">
-            <div class="selection-display">
-                <p>Selected Hall: <span id="selected-hall">None</span></p>
-            </div>
-            <a href="final.html" id="next-button" class="next-button" disabled>Next</a>
-        </div>
+        </form>
     </div>
 
- <script type="text/javascript" src="{{ url_for('static',filename='js/hall.js') }} "></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const selectedHallDisplay = $('#selected-hall');
+            const selectedHallIdInput = $('#selectedHallId');
+            const nextButton = $('#next-button');
+            const hallsContainer = $('#halls-container');
+
+            // Get date and time from sessionStorage and set hidden inputs
+            const selectedDate = sessionStorage.getItem('selectedDate');
+            const startTime = sessionStorage.getItem('startTime');
+            const endTime = sessionStorage.getItem('endTime');
+
+            $('#selectedDateInput').val(selectedDate || '');
+            $('#startTimeInput').val(startTime || '');
+            $('#endTimeInput').val(endTime || '');
+
+            // Event delegation for hall button clicks (works for dynamically added buttons)
+            hallsContainer.on('click', '.hall-btn', function() {
+                // Remove 'selected' class from all buttons
+                $('.hall-btn').removeClass('selected');
+                // Add 'selected' class to the clicked button
+                $(this).addClass('selected');
+
+                // Get the hall ID and name from data attributes
+                const hallId = $(this).data('hall-id');
+                const hallName = $(this).data('hall-name');
+
+                // Update the hidden input and display span
+                selectedHallIdInput.val(hallId);
+                selectedHallDisplay.text(hallName);
+
+                // Enable the "Next" button
+                nextButton.prop('disabled', false).removeClass('cursor-not-allowed opacity-50').addClass('cursor-pointer');
+            });
+
+            // Optional: If you want to pre-select a hall based on a value from backend
+            // This would require passing 'initial_hall_id' from Flask to a JavaScript variable.
+            // For example: const initialSelectedHallId = "{{ initial_hall_id | default('') }}";
+            // if (initialSelectedHallId) {
+            //     $(`.hall-btn[data-hall-id="${initialSelectedHallId}"]`).click();
+            // }
+        });
+    </script>
 </body>
 </html>
