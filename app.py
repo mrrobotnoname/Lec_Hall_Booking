@@ -1,6 +1,7 @@
 from flask import Flask,render_template,session,request,redirect,flash,url_for,abort
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy      
 from datetime import datetime
+from hashlib import sha256
 
 
 
@@ -40,15 +41,16 @@ class Hall(db.Model):
    id = db.Column(db.Integer,primary_key = True)
    hallName = db.Column(db.String(5),nullable = False,unique=True)
    hallType = db.Column(db.String(10),nullable=False)
-   status = db.Column(db.Boolean,default=False,nullable=False)
+   bookings = db.relationship('Booking',backref='hall',lazy=True)
 
 class Booking(db.Model):
    booking_session = db.Column(db.String(100),primary_key=True)
    user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
    hall_id = db.Column(db.Integer,db.ForeignKey('hall.id'),nullable=False)
    year_id = db.Column(db.Integer,db.ForeignKey('year.id'),nullable=False)
-   start_time = db.Column(db.DateTime,nullable=False)
-   end_time = db.Column(db.DateTime,nullable=False)
+   department_id = db.Column(db.Integer,db.ForeignKey('department.id'),nullable=False)
+   startDatetime = db.Column(db.DateTime,nullable=False)
+   endDatetime = db.Column(db.DateTime,nullable=False)
      
 
 @app.route('/',methods = ['GET', 'POST'])
@@ -182,31 +184,84 @@ def api():
 def department():
    departments = Department.query.all()
    if request.method == "POST":
+      if 'user' not in session and session.get('user') is None:
+         return redirect(url_for('viwewBookings'))
       session['selected_department'] = request.form.get('faculty')
       session['selected_year'] = request.form.get('year')
-      return redirect(url_for('selecthall'))
+      return redirect(url_for('selectDatetime'))
    return render_template('department.html',departments=departments)
-@app.route('/selecthall',methods = ['GET', 'POST'])
-def selecthall():
-   halls = Hall.query.all()
-   if request.method == "POST":
-         session['selected_hall'] = request.form.get('hall')
-         return redirect(url_for('selectDatetime'))
-   if 'selected_department' not in session and session.get('selected_department') is None:
-      return redirect(url_for('department'))
-   else:
-      if 'user' not in session and session.get('user_level',2) != 1:
-         return redirect(url_for('viewbooking'))
-      return render_template('hall.html',halls=halls)
-@app.route('/selectdatetime')
+
+@app.route('/selectdatetime',methods = ['GET', 'POST'])
 def selectDatetime():
-   if 'user' not in session and session.get('user') is None:
+   if request.method == "POST":
+      session['date'] =  request.form['selectedDate']
+      session['start_time'] = request.form['startTime']
+      session['end_time'] = request.form['endTime']
+      return redirect(url_for('selectHall'))
+   else:
+      if 'user' not in session and session.get('user') is None:
+         return redirect(url_for('viwewBookings'))
+      elif 'selected_department' not in session or 'selected_year' not in session:
+         flash("Please select a department and year first",category="warning")
+         return redirect(url_for('department'))
+      return render_template('date.html')
+
+
+@app.route('/selecthall',methods = ['GET', 'POST'])
+def selectHall():
+   all_halls = Hall.query.all()
+   if request.method == "POST":
+      session['selected_hall'] = request.form.get('selectedHallId')
+      return redirect(url_for('book'))
+   else:
+      if 'selected_department' not in session or 'selected_year' not in session:
+         flash("Please select a department and year first",category="warning")
+         return redirect(url_for('department'))
+      elif 'date' not in session or 'start_time' not in session or 'end_time' not in session:
+         flash("Please select a date and time first",category="warning")
+         return redirect(url_for('selectDatetime'))
+      else:
+            date = datetime.strptime(session['date'], '%Y-%m-%d')
+            start_time = datetime.strptime(session['start_time'], '%H:%M')
+            end_time = datetime.strptime(session['end_time'], '%H:%M')
+            start_datetime = datetime.combine(date, start_time.time())
+            end_datetime = datetime.combine(date, end_time.time())
+
+            
+            overlap_booking = Booking.query.filter(Booking.startDatetime < end_datetime,
+                                                   Booking.endDatetime >start_datetime
+                                                   ).with_entities(Booking.hall_id).all()
+            booked_ids = [b.hall_id for b in overlap_booking]
+            halls = Hall.query.filter(~Hall.id.in_(booked_ids)).all()
+            return render_template('hall.html',halls=halls)
+
+   
+@app.route('/book',methods = ['GET', 'POST'])
+def book():
+   if 'user' not in session or session.get('user') is None:
+      return redirect(url_for('login'))
+   if request.method == "POST":
+      hall_id = int(session['selected_hall'])
+      department_id = int(session['selected_department'])
+      year_id = int(session['selected_year'])
+      start_datetime = datetime.strptime(session['date'] + ' ' + session['start_time'], '%Y-%m-%d %H:%M')
+      end_datetime = datetime.strptime(session['date'] + ' ' + session['end_time'], '%Y-%m-%d %H:%M')
+      booking_session = sha256(f"{session['date']}_{session['selected_hall']}_{session['end_time']}_{session['selected_department']}".encode('utf-8')).hexdigest()
+      
+      new_booking = Booking(booking_session=booking_session,user_id=session.get('user'),hall_id=hall_id,
+                            year_id=year_id,department_id=department_id,startDatetime=start_datetime,endDatetime=end_datetime)
+      db.session.add(new_booking)
+      db.session.commit()
+      session.pop('selected_department', None)
+      session.pop('selected_year', None)
+      session.pop('date', None)
+      session.pop('start_time', None)
+      session.pop('end_time', None)
+      session.pop('selected_hall', None)
+      flash("Booking successful!",category="success")
       return redirect(url_for('root'))
-   if session.get('selected_department') and session.get('selected_hall') is None:
-      return redirect(url_for('department'))
-   return render_template('datetime.html')
-   
-   
+   return render_template('book.html')
+
 @app.route('/logout')
 def logout():
    session.pop('user',None)

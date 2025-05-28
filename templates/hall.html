@@ -18,6 +18,11 @@
             border-color: #3b82f6;
             box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
         }
+        /* New rule: Style for selected hall button on hover */
+        .hall-btn.selected:hover {
+            background-color: #2563eb; /* A slightly darker blue for hover */
+            color: #e0f2fe; /* A very light blue/off-white for text on hover */
+        }
         /* Style for disabled next button */
         .next-button.disabled {
             cursor: not-allowed;
@@ -34,9 +39,6 @@
         
         <form id="hallSelectionForm" action="" method="post">
             <input type="hidden" name="selectedHallId" id="selectedHallId">
-            <input type="hidden" name="selectedDate" id="selectedDateInput">
-            <input type="hidden" name="startTime" id="startTimeInput">
-            <input type="hidden" name="endTime" id="endTimeInput">
 
             <div id="halls-container">
                 {# Initialize a dictionary to group halls by derived building name #}
@@ -44,9 +46,7 @@
 
                 {# Loop through all halls passed from the backend #}
                 {% for hall in halls %}
-                    {# Filter by status: only include halls where status is False (available) #}
-                    {% if hall.status == False %}
-                        {# Derive building name from hallName #}
+
                         {% set building_prefix = hall.hallName[0] %}
                         {% if building_prefix == 'L' %}
                             {% set building_name = 'Laboratories' %}
@@ -54,15 +54,12 @@
                             {% set building_name = building_prefix + ' Building' %}
                         {% endif %}
 
-                        {# Add hall to the appropriate building group #}
                         {% if building_name not in grouped_halls %}
                             {% set _ = grouped_halls.update({building_name: []}) %}
                         {% endif %}
                         {% set _ = grouped_halls[building_name].append(hall) %}
-                    {% endif %}
                 {% endfor %}
 
-                {# Now, loop through the prepared grouped_halls to display them #}
                 {% if grouped_halls %}
                     {% for building, halls_in_building in grouped_halls.items() %}
                         <div class="hall-section mb-6">
@@ -97,15 +94,6 @@
             const selectedHallIdInput = $('#selectedHallId');
             const nextButton = $('#next-button');
             const hallsContainer = $('#halls-container');
-
-            // Get date and time from sessionStorage and set hidden inputs
-            const selectedDate = sessionStorage.getItem('selectedDate');
-            const startTime = sessionStorage.getItem('startTime');
-            const endTime = sessionStorage.getItem('endTime');
-
-            $('#selectedDateInput').val(selectedDate || '');
-            $('#startTimeInput').val(startTime || '');
-            $('#endTimeInput').val(endTime || '');
 
             // Event delegation for hall button clicks (works for dynamically added buttons)
             hallsContainer.on('click', '.hall-btn', function() {
