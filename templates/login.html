@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome Back | Sign In</title>
+{% extends "base.html" %}
+    {% block title %}Welcome Back | Sign In {% endblock %}
+
+    {%block head %}
     <link rel="stylesheet" href="{{ url_for('static',filename='css/login.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
+   {% endblock %}
+{% block content %}
     <div class="container">
         <div class="left-panel">
             <div class="logo">
@@ -44,11 +41,8 @@
                 </div>
                 
                 <input type="submit" class="signin-btn" value="Sign In">
-            </form>
-            
-            <!-- <div class="signup-link">
-                Don't have an account? <a href="#">Sign up</a>
-            </div> -->
+            </form>          
+
         </div>
         
         <div class="right-panel">
@@ -74,5 +68,5 @@
             }
         }
     </script>
-</body>
+{% endblock %}
 </html>
