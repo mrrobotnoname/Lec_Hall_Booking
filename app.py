@@ -11,13 +11,7 @@ adminpass = "Ammoeka"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)
 
-#admins department will be 0
-# admin userlevel is 0 
-#department will be represent in numbers
-#it-1
-#pm-2
-#eng-3
-# acount-4
+
  
 class User(db.Model):
     id = db.Column(db.Integer,primary_key=True)
@@ -112,7 +106,15 @@ def admin():
             return redirect(url_for("admin"))
          
          if value == "delete_department":
-            delValue= db.session.get(Department,int(request.form.get("department")))
+            department = request.form.get("department")
+            delValue= db.session.get(Department,int(department))
+            delYears = Year.query.filter_by(department_id = int(department)).all()
+            delBookings = Booking.query.filter_by(department_id = int(department)).all()
+            for delYear in delYears:
+               db.session.delete(delYear)
+            for delBooking in delBookings:
+               db.session.delete(delBooking)
+
             db.session.delete(delValue)
             db.session.commit()
             flash("Departmet deleted sucsessfully!",category="success")
@@ -260,8 +262,18 @@ def book():
       session.pop('selected_hall', None)
       flash("Booking successful!",category="success")
       return redirect(url_for('root'))
-   return render_template('book.html')
+   data=[['selected_department'] ,['selected_year'] ]
+   return render_template('book.html',datas =data)
 
+
+@app.route('/viewbookings')
+def viwewBookings():
+
+   department = session['selected_department'] 
+   year = session['selected_year']
+      
+
+   return render_template('viewbookings.html')
 @app.route('/logout')
 def logout():
    session.pop('user',None)
