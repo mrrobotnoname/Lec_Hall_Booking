@@ -266,6 +266,8 @@ def book():
    return render_template('book.html',datas =data)
 
 
+
+
 @app.route('/viewbookings')
 def viwewBookings():
 
