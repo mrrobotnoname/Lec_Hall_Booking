@@ -1,24 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+{% extends "base.html" %}
+    {% block title %}Admin Panel{% endblock %}
+    {% block head %}
     <link rel="stylesheet" href="{{ url_for('static',filename='/css/admin.css') }}">
-    <style>
-
-    </style>
+    {% endblock %}
 </head>
 <body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flashes">
-        {% for category, message in messages %}
-          <div class="flash-{{ category }}">{{ message }} <button type="button" class="close-btn" onclick="closeFlashMessage(this)">&times;</button> </div>
-        {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
+    {%block content %}
     <h1>Manage Department</h1>
     <a href="{{ url_for('logout') }}">Logout</a>
     <div class="form-container">
@@ -141,6 +128,9 @@
                         <label for="deleteHall">Select Hall to Delete:</label>
                         <select id="deleteHall" name="deleteHall" required>
                             <option value="" disabled selected>Select The Hall</option>
+                            {% for hall in halls %}
+                                <option value="{{hall.id}}">{{hall.hallName}}</option>
+                                {% endfor %}
                         </select><br><br>
                         <input type="submit" value="Delete Hall">
                     </form>
@@ -186,11 +176,27 @@
             </tr>
         </table>
     </div>
+{% endblock %}
 
-    <script>
 
-    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <script>
+         $(document).ready(function() {
+            $('#deleteYearDepartment').change(function() {
+                var faculty = $(this).val();
+                $.ajax({
+                    url: '/api?action=getYears&faculty=' + faculty,
+                    method: 'GET',
+                    success: function(years) {
+                        $('#deleteYear').empty();
+                        years.forEach(function(year) {
+                            $('#deleteYear').append(new Option(year, year));
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

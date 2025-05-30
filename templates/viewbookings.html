@@ -6,12 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="" method="post">
-        {% for data in datas %}
-        <p>{{data.selected_department}}</p>
-        {% endfor %}
-
-        <input type="submit" value="Book Now">
-    </form>
+    {% for q in queries %}
+    <h1>{{q.hallName}}</h1>
+    {% endfor%}
 </body>
 </html>
