@@ -23,7 +23,6 @@ class User(db.Model):
 class Department(db.Model):
    id=db.Column(db.Integer,primary_key=True)
    department_name=db.Column(db.String(50),nullable=False,unique = True)
-   year = db.relationship('Year',backref='department',lazy=True )
 
 class Year(db.Model):
    id = db.Column(db.Integer,primary_key=True)
@@ -31,11 +30,11 @@ class Year(db.Model):
    year = db.Column(db.Integer,nullable=False)
 
 
+
 class Hall(db.Model):
    id = db.Column(db.Integer,primary_key = True)
    hallName = db.Column(db.String(5),nullable = False,unique=True)
    hallType = db.Column(db.String(10),nullable=False)
-   bookings = db.relationship('Booking',backref='hall',lazy=True)
 
 class Booking(db.Model):
    booking_session = db.Column(db.String(100),primary_key=True)
@@ -45,7 +44,11 @@ class Booking(db.Model):
    department_id = db.Column(db.Integer,db.ForeignKey('department.id'),nullable=False)
    startDatetime = db.Column(db.DateTime,nullable=False)
    endDatetime = db.Column(db.DateTime,nullable=False)
-     
+
+   user = db.relationship('User', backref='bookings', lazy=True)
+   hall = db.relationship('Hall', backref='bookings', lazy=True)
+   year = db.relationship('Year', backref='bookings', lazy=True) 
+   department = db.relationship('Department', backref='bookings', lazy=True)  
 
 @app.route('/',methods = ['GET', 'POST'])
 def root():
@@ -137,6 +140,9 @@ def admin():
             department = request.form.get('faculty')  
             year = request.form.get('year')
             deletes = Year.query.filter_by(department_id = int(department),year = int(year)).all()
+            delBookings = Booking.query.filter_by(year_id = int(year)).all()
+            for delBooking in delBookings:
+               db.session.delete(delBooking)
             for delete in deletes:   
                db.session.delete(delete)
             db.session.commit()
@@ -146,7 +152,7 @@ def admin():
             hallName = request.form["name"]
             hallType = request.form.get('hallType')
             if Hall.query.filter_by(hallName = hallName).one_or_none() is None:
-               add = Hall(hallName = hallName,hallType=hallType,status = 0)
+               add = Hall(hallName = hallName,hallType=hallType)
                db.session.add(add)
                db.session.commit()
                flash("Hall been Added!",category="success")
@@ -155,6 +161,9 @@ def admin():
             return redirect(url_for('admin'))         
          if value == "delete_hall":
             delValue = db.session.get(Hall,request.form.get("deleteHall"))
+            delBookings = Booking.query.filter_by(hall_id = int(request.form.get('deleteHall'))).all()
+            for delBooking in delBookings:
+               db.session.delete(delBooking)
             db.session.delete(delValue)
             db.session.commit()
             flash("The hall was deleted succsessfully!",category="success")
@@ -171,6 +180,19 @@ def admin():
                return redirect(url_for('admin'))
             flash("The lecture is already exsist!",category="warning")
             return redirect(url_for('admin'))
+         if value == "delete_lecture":
+            delValue = db.session.get(User,request.form.get("deleteLecture"))
+            delBookings = Booking.query.filter_by(user_id = int(request.form.get('deleteLecture'))).all()
+            
+            if delValue is not None:
+               for delBooking in delBookings:
+                  db.session.delete(delBooking)
+               db.session.delete(delValue)
+               db.session.commit()
+               flash("The lecture was deleted successfully!",category="success")
+               return redirect(url_for('admin'))
+            flash("The lecture does not exist!",category="warning")
+            return redirect(url_for('admin'))
       return render_template("admin.html",users=users,departments=departments,halls=halls)
    return redirect(url_for('root'))
    
@@ -186,8 +208,6 @@ def api():
 def department():
    departments = Department.query.all()
    if request.method == "POST":
-      if 'user' not in session and session.get('user') is None:
-         return redirect(url_for('viwewBookings'))
       session['selected_department'] = request.form.get('faculty')
       session['selected_year'] = request.form.get('year')
       return redirect(url_for('selectDatetime'))
@@ -202,7 +222,7 @@ def selectDatetime():
       return redirect(url_for('selectHall'))
    else:
       if 'user' not in session and session.get('user') is None:
-         return redirect(url_for('viwewBookings'))
+         return redirect(url_for('view_bookings'))
       elif 'selected_department' not in session or 'selected_year' not in session:
          flash("Please select a department and year first",category="warning")
          return redirect(url_for('department'))
@@ -249,8 +269,8 @@ def book():
       start_datetime = datetime.strptime(session['date'] + ' ' + session['start_time'], '%Y-%m-%d %H:%M')
       end_datetime = datetime.strptime(session['date'] + ' ' + session['end_time'], '%Y-%m-%d %H:%M')
       booking_session = sha256(f"{session['date']}_{session['selected_hall']}_{session['end_time']}_{session['selected_department']}".encode('utf-8')).hexdigest()
-      
-      new_booking = Booking(booking_session=booking_session,user_id=session.get('user'),hall_id=hall_id,
+      getid = User.query.filter_by(username=session['user']).one_or_none()
+      new_booking = Booking(booking_session=booking_session,user_id=getid.id,hall_id=hall_id,
                             year_id=year_id,department_id=department_id,startDatetime=start_datetime,endDatetime=end_datetime)
       db.session.add(new_booking)
       db.session.commit()
@@ -265,17 +285,108 @@ def book():
    data=[['selected_department'] ,['selected_year'] ]
    return render_template('book.html',datas =data)
 
+#Keep in mind this was genarated by Ai that means you sucked and need to be better.
+@app.route('/view-bookings')
+def view_bookings():
+    if 'user' in session:
+       user_id = User.query.filter_by(username=session.get('user')).id 
+    else:
+         user_id = None
+    if user_id:
+        current_user = User.query.get(user_id)
+        
+        if not current_user:
+            session.pop('user', None)
+            return redirect(url_for('login'))
+        
+        user_bookings = Booking.query.options(
+            db.joinedload(Booking.hall),
+            db.joinedload(Booking.year),
+            db.joinedload(Booking.department),
+            db.joinedload(Booking.user)
+        ).filter(Booking.user_id == user_id)\
+         .order_by(Booking.startDatetime).all()
+        other_bookings = Booking.query.options(
+            db.joinedload(Booking.hall),
+            db.joinedload(Booking.year),
+            db.joinedload(Booking.department),
+            db.joinedload(Booking.user)
+        ).filter(Booking.user_id != user_id)\
+         .order_by(Booking.startDatetime).all()
+        
+        return render_template('view_bookings.html', 
+                             user_bookings=user_bookings,
+                             other_bookings=other_bookings,
+                             current_user=current_user,
+                             is_logged_in=True)
+    
+    else:
+        selected_department_id = session.get('selected_department')
+        selected_year_id = session.get('selected_year')
+        
+        if selected_department_id and selected_year_id:
+            filtered_bookings = Booking.query.options(
+                db.joinedload(Booking.hall),
+                db.joinedload(Booking.year),
+                db.joinedload(Booking.department),
+                db.joinedload(Booking.user)
+            ).filter(
+                Booking.department_id == selected_department_id,
+                Booking.year_id == selected_year_id
+            ).order_by(Booking.startDatetime).all()
+            
+            selected_department = Department.query.get(selected_department_id)
+            selected_year = Year.query.get(selected_year_id)
+            
+            return render_template('view_bookings.html',
+                                 filtered_bookings=filtered_bookings,
+                                 selected_department=selected_department,
+                                 selected_year=selected_year,
+                                 is_logged_in=False)
+        else:
+            return render_template('view_bookings.html',
+                                 message="Please select a department and year first.",
+                                 is_logged_in=False)
+
+@app.route('/clear-selection')
+def clear_selection():
+    """Clear department and year selection from session"""
+    session.pop('selected_department', None)
+    session.pop('selected_year', None)
+    return redirect(url_for('view_bookings'))
+
+# Additional Flask-SQLAlchemy helper functions
+def get_safe_bookings_query():
+    """
+    Helper function to get bookings with safe joins to avoid None errors
+    Uses Flask-SQLAlchemy's query builder with proper error handling
+    """
+    return Booking.query.options(
+        db.joinedload(Booking.hall),
+        db.joinedload(Booking.year),
+        db.joinedload(Booking.department),
+        db.joinedload(Booking.user)
+    ).join(User, Booking.user_id == User.id)\
+     .join(Hall, Booking.hall_id == Hall.id)\
+     .join(Year, Booking.year_id == Year.id)\
+     .join(Department, Booking.department_id == Department.id)
+
+def validate_booking_relationships():
+    """
+    Helper function to check for orphaned bookings (useful for debugging)
+    """
+    orphaned_bookings = db.session.query(Booking.booking_session).outerjoin(
+        User, Booking.user_id == User.id
+    ).filter(User.id.is_(None)).all()
+    
+    if orphaned_bookings:
+        print(f"Warning: Found {len(orphaned_bookings)} bookings with invalid user references")
+    
+    return len(orphaned_bookings) == 0
 
 
 
-@app.route('/viewbookings')
-def viwewBookings():
-
-   department = session['selected_department'] 
-   year = session['selected_year']
       
-
-   return render_template('viewbookings.html')
 @app.route('/logout')
 def logout():
    session.pop('user',None)

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Bookings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        select {
+            width: 200px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .bookings-section {
+            margin-top: 20px;
+        }
+        .section-title {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            margin: 20px 0 10px 0;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .user-bookings {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        .other-bookings {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .no-bookings {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+        }
+        .selected-info {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hall Bookings</h1>
+        
+        {% if is_logged_in %}
+            <!-- Logged in user view -->
+            <div class="selected-info">
+                <h3>Welcome, {{ current_user.name }}!</h3>
+                <p>Below are your bookings followed by other lecturers' bookings.</p>
+            </div>
+            
+            <!-- User's own bookings -->
+            <div class="section-title user-bookings">Your Bookings</div>
+            {% if user_bookings %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hall</th>
+                            <th>Department</th>
+                            <th>Year</th>
+                            <th>Start Date & Time</th>
+                            <th>End Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in user_bookings %}
+                        <tr>
+                            <td>{{ booking.hall.hallName if booking.hall else 'N/A' }}</td>
+                            <td>{{ booking.department.department_name if booking.department else 'N/A' }}</td>
+                            <td>{{ booking.year.year if booking.year else 'N/A' }}</td>
+                            <td>{{ booking.startDatetime.strftime('%Y-%m-%d %H:%M') if booking.startDatetime else 'N/A' }}</td>
+                            <td>{{ booking.endDatetime.strftime('%Y-%m-%d %H:%M') if booking.endDatetime else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-bookings">You have no bookings yet.</div>
+            {% endif %}
+            
+            <!-- Other lecturers' bookings -->
+            <div class="section-title other-bookings">Other Lecturers' Bookings</div>
+            {% if other_bookings %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Lecturer</th>
+                            <th>Hall</th>
+                            <th>Department</th>
+                            <th>Year</th>
+                            <th>Start Date & Time</th>
+                            <th>End Date & Time</th>
+                            <th>Session</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in other_bookings %}
+                        <tr>
+                            <td>{{ booking.user.name if booking.user else 'N/A' }}</td>
+                            <td>{{ booking.hall.hallName if booking.hall else 'N/A' }}</td>
+                            <td>{{ booking.department.department_name if booking.department else 'N/A' }}</td>
+                            <td>{{ booking.year.year if booking.year else 'N/A' }}</td>
+                            <td>{{ booking.startDatetime.strftime('%Y-%m-%d %H:%M') if booking.startDatetime else 'N/A' }}</td>
+                            <td>{{ booking.endDatetime.strftime('%Y-%m-%d %H:%M') if booking.endDatetime else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-bookings">No other bookings found.</div>
+            {% endif %}
+            
+        {% else %}
+            <!-- Non-logged in user view -->
+            {% if message %}
+                <div class="selected-info" style="background-color: #fff3cd; border-left: 4px solid #ffc107;">
+                    <h3>{{ message }}</h3>
+                    <p>You need to select a department and year before viewing bookings.</p>
+                    <a href="{{ url_for('department') }}" style="text-decoration: none;">
+                        <button type="button">Select Department & Year</button>
+                    </a>
+                </div>
+            {% elif filtered_bookings is defined %}
+                <div class="selected-info">
+                    <strong>Currently viewing:</strong> 
+                    {{ selected_department.department_name }} - Year {{ selected_year.year }}
+                    <a href="{{ url_for('clear_selection') }}" style="margin-left: 15px;">
+                        <button type="button" class="btn-secondary">Change Selection</button>
+                    </a>
+                </div>
+                
+                <div class="bookings-section">
+                    <div class="section-title">
+                        Bookings for {{ selected_department.department_name }} - Year {{ selected_year.year }}
+                    </div>
+                    
+                    {% if filtered_bookings %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Lecturer</th>
+                                    <th>Hall</th>
+                                    <th>Start Date & Time</th>
+                                    <th>End Date & Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in filtered_bookings %}
+                                <tr>
+                                    <td>{{ booking.user.name if booking.user else 'N/A' }}</td>
+                                    <td>{{ booking.hall.hallName if booking.hall else 'N/A' }}</td>
+                                    <td>{{ booking.startDatetime.strftime('%Y-%m-%d %H:%M') if booking.startDatetime else 'N/A' }}</td>
+                                    <td>{{ booking.endDatetime.strftime('%Y-%m-%d %H:%M') if booking.endDatetime else 'N/A' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="no-bookings">
+                            No bookings found for {{ selected_department.department_name }} - Year {{ selected_year.year }}.
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>

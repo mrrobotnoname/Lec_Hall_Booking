@@ -3,200 +3,192 @@
     {% block head %}
     <link rel="stylesheet" href="{{ url_for('static',filename='/css/admin.css') }}">
     {% endblock %}
-</head>
-<body>
-    {%block content %}
-    <h1>Manage Department</h1>
-    <a href="{{ url_for('logout') }}">Logout</a>
-    <div class="form-container">
-        <table>
-            <tr>
-                <th>Add Department</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="" method="post">
-                        <input type="hidden" name="action" value="add_department">
-                        <label for="facultyName">Department Name:</label>
-                        <input type="text" id="facultyName" name="name" required><br><br>
-                        <input type="submit" value="Add Faculty">
-                    </form>
-                </td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <th>Delete Department</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="" method="post">
-                        <input type="hidden" name="action" value="delete_department">
-                        <label for="deleteFaculty">Select Department to Delete:</label>
-                        <select id="deleteFaculty" name="department" required>
-                            <option value="" disabled selected>Select the Department</option>
-                            {% for department in departments %}
-                            <option value="{{department.id}}">{{department.department_name}}</option>
-                            {% endfor %}
-                        </select><br><br>
-                        <input type="submit" value="Delete Faculty">
-                    </form>
-                </td>
-            </tr>
-        </table>
+    {% block content %}
+    <div class="admin-header">
+        <h1>Admin Panel</h1>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
     </div>
 
-    <h1>Manage Year</h1>
-    <div class="form-container">
-        <table>
-            <tr>
-                <th>Add Year</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="" method="post">
-                        <input type="hidden" name="action" value="add_year">
-                        <label for="department">Select Department:</label>
-                        <select id="department" name="department" required>
-                            {% for department in departments %}
-                            <option value="{{department.id}}">{{department.department_name}}</option>
-                            {% endfor %}
-                        </select><br><br>
-                        <label for="year">Year:</label>
-                        <input type="number" id="year" name="year" required><br><br>
-                        <input type="submit" value="Add Year">
-                    </form>
-                </td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <th>Delete Year</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="/admin" method="post">
-                        <input type="hidden" name="action" value="delete_year">
-                        <label for="deleteYearDepartment">Select Department:</label>
-                            <select id="deleteYearDepartment" name="faculty" required>
-                                <option value="" selected disabled>Select the Department</option>
-                                {% for department in departments %}
-                                <option value="{{department.id}}">{{department.department_name}}</option>
-                                {% endfor %}
-                            </select><br><br>
-                            <label for="deleteYear">Select Year to Delete:</label>
-                            <select id="deleteYear" name="year" required>
-                                <option value="" disabled selected>Select The Year</option>
-                            </select><br><br>
-                        <input type="submit" value="Delete Year">
-                    </form>
-                </td>
-            </tr>
-        </table>
-    </div>
+    <div class="admin-grid">
+        <!-- Department Management -->
+        <div class="admin-section">
+            <div class="section-header">
+                <i class="fas fa-building"></i> Manage Department
+            </div>
+            <div class="section-content">
+                <div class="form-row">
+                    <div class="form-card add-card">
+                        <h3>Add Department</h3>
+                        <form action="" method="post">
+                            <input type="hidden" name="action" value="add_department">
+                            <div class="form-group">
+                                <label for="facultyName">Department Name:</label>
+                                <input type="text" id="facultyName" name="name" required>
+                            </div>
+                            <input type="submit" value="Add Faculty" class="btn-primary">
+                        </form>
+                    </div>
+                    <div class="form-card delete-card">
+                        <h3>Delete Department</h3>
+                        <form action="" method="post">
+                            <input type="hidden" name="action" value="delete_department">
+                            <div class="form-group">
+                                <label for="deleteFaculty">Select Department to Delete:</label>
+                                <select id="deleteFaculty" name="department" required>
+                                    <option value="" disabled selected>Select the Department</option>
+                                    {% for department in departments %}
+                                    <option value="{{department.id}}">{{department.department_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="submit" value="Delete Faculty" class="btn-danger">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <h1>Manage Hall</h1>
-    <div class="form-container">
-        <table>
-            <tr>
-                <th>Add Hall</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="/admin" method="post">
-                        <input type="hidden" name="action" value="add_hall">
-                        <label for="hallName">Hall Name:</label>
-                        <input type="text" id="hallName" name="name" required>
-                        <label for="hallName">Hall Type</label>
-                        <select name="hallType" required>
-                            <option value="Lecture Hall" selected>Lecture Hall</option>
-                            <option value="Laboratory">Laboratory</option>
-                        </select><br><br>
-                        <input type="submit" value="Add Hall">
-                    </form>
-                </td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <th>Delete Hall</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="/admin" method="post">
-                        <input type="hidden" name="action" value="delete_hall">
-                        <label for="deleteHall">Select Hall to Delete:</label>
-                        <select id="deleteHall" name="deleteHall" required>
-                            <option value="" disabled selected>Select The Hall</option>
-                            {% for hall in halls %}
-                                <option value="{{hall.id}}">{{hall.hallName}}</option>
-                                {% endfor %}
-                        </select><br><br>
-                        <input type="submit" value="Delete Hall">
-                    </form>
-                </td>
-            </tr>
-        </table>
-    </div>
-    <h1>Manage User</h1>
-    <div class="form-container">
-        <table>
-            <tr>
-                <th>Add Lecture</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="/admin" method="post">
-                        <input type="hidden" name="action" value="add_lecture">
-                        <label for="name">Name:</label>
-                        <input type="text" id="name" name="name" required><br><br>
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" required><br><br>
-                        <label for="password">Password:</label>
-                        <input type="password" id="password" name="password" required><br><br>
-                        <input type="submit" value="Add Lecture">
-                    </form>
-                </td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <th>Delete Teacher</th>
-            </tr>
-            <tr>
-                <td>
-                    <form action="/admin" method="post">
-                        <input type="hidden" name="action" value="delete_teacher">
-                        <label for="deleteTeacher">Select Teacher to Delete:</label>
-                        <input type="text" id="deleteTeacher" name="username" required><br><br>
-                        <br><br>
-                        <input type="submit" value="Delete Teacher">
-                    </form>
-                </td>
-            </tr>
-        </table>
-    </div>
-{% endblock %}
+        <!-- Year Management -->
+        <div class="admin-section">
+            <div class="section-header">
+                <i class="fas fa-calendar-alt"></i> Manage Year
+            </div>
+            <div class="section-content">
+                <div class="form-row">
+                    <div class="form-card add-card">
+                        <h3>Add Year</h3>
+                        <form action="" method="post">
+                            <input type="hidden" name="action" value="add_year">
+                            <div class="form-group">
+                                <label for="department">Select Department:</label>
+                                <select id="department" name="department" required>
+                                    {% for department in departments %}
+                                    <option value="{{department.id}}">{{department.department_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="year">Year:</label>
+                                <input type="number" id="year" name="year" required>
+                            </div>
+                            <input type="submit" value="Add Year" class="btn-primary">
+                        </form>
+                    </div>
+                    <div class="form-card delete-card">
+                        <h3>Delete Year</h3>
+                        <form action="/admin" method="post">
+                            <input type="hidden" name="action" value="delete_year">
+                            <div class="form-group">
+                                <label for="deleteYearDepartment">Select Department:</label>
+                                <select id="deleteYearDepartment" name="faculty" required>
+                                    <option value="" selected disabled>Select the Department</option>
+                                    {% for department in departments %}
+                                    <option value="{{department.id}}">{{department.department_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="deleteYear">Select Year to Delete:</label>
+                                <select id="deleteYear" name="year" required>
+                                    <option value="" disabled selected>Select The Year</option>
+                                </select>
+                            </div>
+                            <input type="submit" value="Delete Year" class="btn-danger">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Hall Management -->
+        <div class="admin-section">
+            <div class="section-header">
+                <i class="fas fa-door-open"></i> Manage Hall
+            </div>
+            <div class="section-content">
+                <div class="form-row">
+                    <div class="form-card add-card">
+                        <h3>Add Hall</h3>
+                        <form action="/admin" method="post">
+                            <input type="hidden" name="action" value="add_hall">
+                            <div class="form-group">
+                                <label for="hallName">Hall Name:</label>
+                                <input type="text" id="hallName" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hallType">Hall Type:</label>
+                                <select name="hallType" required>
+                                    <option value="Lecture Hall" selected>Lecture Hall</option>
+                                    <option value="Laboratory">Laboratory</option>
+                                </select>
+                            </div>
+                            <input type="submit" value="Add Hall" class="btn-primary">
+                        </form>
+                    </div>
+                    <div class="form-card delete-card">
+                        <h3>Delete Hall</h3>
+                        <form action="/admin" method="post">
+                            <input type="hidden" name="action" value="delete_hall">
+                            <div class="form-group">
+                                <label for="deleteHall">Select Hall to Delete:</label>
+                                <select id="deleteHall" name="deleteHall" required>
+                                    <option value="" disabled selected>Select The Hall</option>
+                                    {% for hall in halls %}
+                                    <option value="{{hall.id}}">{{hall.hallName}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="submit" value="Delete Hall" class="btn-danger">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- User Management -->
+        <div class="admin-section">
+            <div class="section-header">
+                <i class="fas fa-users"></i> Manage User
+            </div>
+            <div class="section-content">
+                <div class="form-row">
+                    <div class="form-card add-card">
+                        <h3>Add Lecture</h3>
+                        <form action="/admin" method="post">
+                            <input type="hidden" name="action" value="add_lecture">
+                            <div class="form-group">
+                                <label for="name">Name:</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input type="text" id="username" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" name="password" required>
+                            </div>
+                            <input type="submit" value="Add Lecture" class="btn-primary">
+                        </form>
+                    </div>
+                    <div class="form-card delete-card">
+                        <h3>Delete Teacher</h3>
+                        <form action="/admin" method="post">
+                            <input type="hidden" name="action" value="delete_lecture">
+                            <div class="form-group">
+                                <label for="deleteTeacher">Select Teacher to Delete:</label>
+                                <input type="text" id="deleteTeacher" name="username" required>
+                            </div>
+                            <input type="submit" value="Delete Teacher" class="btn-danger">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
 
-    <script>
-         $(document).ready(function() {
-            $('#deleteYearDepartment').change(function() {
-                var faculty = $(this).val();
-                $.ajax({
-                    url: '/api?action=getYears&faculty=' + faculty,
-                    method: 'GET',
-                    success: function(years) {
-                        $('#deleteYear').empty();
-                        years.forEach(function(year) {
-                            $('#deleteYear').append(new Option(year, year));
-                        });
-                    }
-                });
-            });
-        });
-    </script>
-</body>
-</html>
+    <script src="{{ url_for('static',filename='js/admin.js') }}"></script>
+{% endblock %}
