@@ -289,7 +289,7 @@ def book():
 @app.route('/view-bookings')
 def view_bookings():
     if 'user' in session:
-       user_id = User.query.filter_by(username=session.get('user')).id 
+       user_id = User.query.filter_by(username=session.get('user')).one_or_none().id
     else:
          user_id = None
     if user_id:

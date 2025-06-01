@@ -1,83 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Date & Time | Lecture Hall Booking</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; 
-        }
-        .date-cell {
-            padding: 10px;
-            text-align: center;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            font-weight: 500;
-        }
-        .date-cell:hover:not(.empty):not(.past-date):not(.selected) {
-            background-color: #e0f2fe; 
-            color: #1e40af; 
-        }
-        .date-cell.empty {
-            background-color: transparent;
-            cursor: default;
-        }
-        .date-cell.past-date {
-            color: #9ca3af; /* Gray out past dates */
-            cursor: not-allowed;
-            background-color: #f9fafb;
-        }
-        .date-cell.today {
-            border: 2px solid #3b82f6; /* Blue border for today */
-            background-color: #dbeafe; /* Lighter blue background */
-        }
-        .date-cell.selected {
-            background-color: #3b82f6; 
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
-        }
-        /* Style for disabled next button */
-        .next-button.disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+{% extends "base.html" %}
+    {% block title %}Select Date & Time | Lecture Hall Booking{% endblock %}
 
-    <div class="container bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl">
-        <div class="back-button mb-6">
-            <a href="index.html" class="btn btn-outline text-blue-600 hover:text-blue-800 text-sm font-medium">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Quick Book
+    {% block head %}
+    <link rel="stylesheet" href="{{ url_for('static',filename='/css/select_datetime.css') }}">
+    {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="back-button">
+            <a href="index.html">
+                <span class="icon">←</span> Back to Quick Book
             </a>
         </div>
 
-        <div class="page-header text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Select Booking Date & Time</h1>
-            <p class="text-gray-600">Choose your preferred date and time for the booking</p>
+        <div class="page-header">
+            <h1>Select Booking Date & Time</h1>
+            <p>Choose your preferred date and time for the booking</p>
         </div>
 
         <form id="booking-form" method="POST">
-            <div class="date-selector-container mb-10">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Date Selection</h2>
-                <div class="month-navigator flex justify-between items-center bg-gray-100 p-3 rounded-lg mb-4">
-                    <button type="button" class="nav-btn p-2 text-gray-700 hover:bg-gray-200 rounded-full" id="prev-month">
-                        <i class="fas fa-chevron-left"></i>
+            <div class="date-selector-container">
+                <h2>Date Selection</h2>
+                <div class="month-navigator">
+                    <button type="button" class="nav-btn" id="prev-month">
+                        ‹
                     </button>
-                    <h3 class="current-month text-lg font-semibold text-gray-800"></h3>
-                    <button type="button" class="nav-btn p-2 text-gray-700 hover:bg-gray-200 rounded-full" id="next-month">
-                        <i class="fas fa-chevron-right"></i>
+                    <h3 class="current-month"></h3>
+                    <button type="button" class="nav-btn" id="next-month">
+                        ›
                     </button>
                 </div>
 
-                <div class="day-names grid grid-cols-7 text-center font-semibold text-gray-500 mb-2">
+                <div class="day-names">
                     <div>Sun</div>
                     <div>Mon</div>
                     <div>Tue</div>
@@ -87,277 +41,46 @@
                     <div>Sat</div>
                 </div>
 
-                <div class="date-grid grid grid-cols-7 gap-2" id="date-grid">
+                <div class="date-grid" id="date-grid">
                 </div>
                 <input type="hidden" id="selected-date-input" name="selectedDate">
             </div>
 
-            <div class="time-selector-container border-t border-gray-200 pt-8 mt-8">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Time Selection</h2>
-                <p class="time-range-info text-center text-gray-600 mb-6">Available time: 8:00 AM to 6:00 PM</p>
+            <div class="time-selector-container">
+                <h2>Time Selection</h2>
+                <p class="time-range-info">Available time: 8:00 AM to 6:00 PM</p>
                 
-                <div class="time-input-group flex flex-col sm:flex-row justify-center items-center gap-6 mb-8">
-                    <div class="time-input flex flex-col items-center">
-                        <label for="start-time" class="block text-gray-700 text-sm font-medium mb-2">Start Time:</label>
-                        <input type="time" id="start-time" name="startTime" min="08:00" max="18:00" required
-                               class="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto">
+                <div class="time-input-group">
+                    <div class="time-input">
+                        <label for="start-time">Start Time:</label>
+                        <input type="time" id="start-time" name="startTime" min="08:00" max="18:00" required>
                     </div>
                     
-                    <div class="time-input flex flex-col items-center">
-                        <label for="end-time" class="block text-gray-700 text-sm font-medium mb-2">End Time:</label>
-                        <input type="time" id="end-time" name="endTime" min="08:00" max="18:00" required
-                               class="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto">
+                    <div class="time-input">
+                        <label for="end-time">End Time:</label>
+                        <input type="time" id="end-time" name="endTime" min="08:00" max="18:00" required>
                     </div>
                 </div>
                 
-                <div class="time-footer flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div id="time-selection-display" class="time-display text-center sm:text-left">
-                        <p class="text-gray-700">Selected Date: <span id="selected-date-display" class="font-semibold text-blue-600">None</span></p>
-                        <p class="text-gray-700">Selected Time: <span id="selected-time-range" class="font-semibold text-blue-600">Not selected</span></p>
-                        <p class="text-gray-700">Duration: <span id="duration-display" class="font-semibold text-blue-600">0 minutes</span></p>
+                <div class="time-footer">
+                    <div class="time-display">
+                        <p>Selected Date: <span id="selected-date-display">None</span></p>
+                        <p>Selected Time: <span id="selected-time-range">Not selected</span></p>
+                        <p>Duration: <span id="duration-display">0 minutes</span></p>
                     </div>
-                    <div class="date-actions flex flex-col sm:flex-row gap-4">
-                        <button type="button" class="btn btn-outline bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-300" id="clear-selection">
-                            <i class="fas fa-times mr-2"></i> Clear Selection
+                    <div class="date-actions">
+                        <button type="button" class="btn btn-outline" id="clear-selection">
+                            <span class="icon">×</span> Clear Selection
                         </button>
-                        <button type="submit" class="btn btn-primary bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 next-button disabled" id="next-button">
-                            <i class="far fa-calendar-check mr-2"></i> Next
+                        <button type="submit" class="btn btn-primary disabled" id="next-button" disabled>
+                            <span class="icon">✓</span> Next
                         </button>
                     </div>
                 </div>
             </div>
-        </form> </div>
+        </form>
+    </div>
 
-    <script>
-        // Get references to DOM elements
-        const dateGrid = document.getElementById('date-grid');
-        const currentMonthDisplay = document.querySelector('.current-month');
-        const prevMonthBtn = document.getElementById('prev-month');
-        const nextMonthBtn = document.getElementById('next-month');
-        const startTimeInput = document.getElementById('start-time');
-        const endTimeInput = document.getElementById('end-time');
-        const selectedDateDisplay = document.getElementById('selected-date-display');
-        const selectedTimeRangeDisplay = document.getElementById('selected-time-range');
-        const durationDisplay = document.getElementById('duration-display');
-        const clearSelectionBtn = document.getElementById('clear-selection');
-        const nextButton = document.getElementById('next-button');
+    <script src="{{ url_for('static', filename='js/select_datetime.js') }}"></script>
 
-        // Hidden input fields for form submission
-        const selectedDateInput = document.getElementById('selected-date-input');
-
-        // Variables to manage calendar state
-        let currentMonth = new Date().getMonth(); // Current month (0-11)
-        let currentYear = new Date().getFullYear(); // Current year
-        let selectedDate = null; // Stores the selected date object
-
-        /**
-         * Renders the calendar grid for the current month and year.
-         */
-        function renderCalendar() {
-            dateGrid.innerHTML = ''; // Clear previous dates
-            currentMonthDisplay.textContent = new Date(currentYear, currentMonth).toLocaleString('en-US', { month: 'long', year: 'numeric' });
-
-            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0 for Sunday, 1 for Monday, etc.
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Number of days in current month
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Normalize today's date to compare correctly
-
-            // Calculate the maximum selectable date (today + 4 days, for a total of 5 days)
-            const maxSelectableDate = new Date(today);
-            maxSelectableDate.setDate(today.getDate() + 4);
-            maxSelectableDate.setHours(0, 0, 0, 0);
-
-            // Add empty cells for days before the first day of the month
-            for (let i = 0; i < firstDayOfMonth; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.classList.add('date-cell', 'empty');
-                dateGrid.appendChild(emptyCell);
-            }
-
-            // Add date cells for each day of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateCell = document.createElement('div');
-                dateCell.classList.add('date-cell');
-                dateCell.textContent = day;
-
-                const date = new Date(currentYear, currentMonth, day);
-                date.setHours(0, 0, 0, 0); // Normalize current date cell date
-
-                // Add classes for past dates, today, and dates beyond the 5-day limit
-                if (date < today || date > maxSelectableDate) {
-                    dateCell.classList.add('past-date'); // Reusing past-date class for unselectable dates
-                } else if (date.getTime() === today.getTime()) {
-                    dateCell.classList.add('today');
-                }
-
-                if (selectedDate && date.getTime() === selectedDate.getTime()) {
-                    dateCell.classList.add('selected');
-                }
-
-                // Attach click listener to each date cell
-                dateCell.addEventListener('click', () => {
-                    // Only allow selection if it's not empty and not a "past-date" (which now includes dates beyond the 5-day limit)
-                    if (!dateCell.classList.contains('empty') && !dateCell.classList.contains('past-date')) {
-                        // Remove 'selected' class from previously selected date
-                        const previouslySelected = dateGrid.querySelector('.date-cell.selected');
-                        if (previouslySelected) {
-                            previouslySelected.classList.remove('selected');
-                        }
-
-                        // Add 'selected' class to the clicked date
-                        dateCell.classList.add('selected');
-                        selectedDate = date; // Update the selected date
-
-                        // Update the display and hidden input
-                        selectedDateDisplay.textContent = selectedDate.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-                        selectedDateInput.value = selectedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-
-                        updateNextButtonState();
-                    }
-                });
-
-                dateGrid.appendChild(dateCell);
-            }
-        }
-
-        /**
-         * Updates the displayed selected time range and duration.
-         */
-        function updateTimeDisplay() {
-            const startTime = startTimeInput.value;
-            const endTime = endTimeInput.value;
-
-            if (startTime && endTime) {
-                selectedTimeRangeDisplay.textContent = `${formatTime(startTime)} - ${formatTime(endTime)}`;
-
-                // Calculate duration
-                const [startHour, startMinute] = startTime.split(':').map(Number);
-                const [endHour, endMinute] = endTime.split(':').map(Number);
-
-                const startDate = new Date();
-                startDate.setHours(startHour, startMinute, 0, 0);
-
-                const endDate = new Date();
-                endDate.setHours(endHour, endMinute, 0, 0);
-
-                // Ensure end time is after start time, especially across midnight (though not relevant for 8 AM - 6 PM range)
-                if (endDate < startDate) {
-                    durationDisplay.textContent = 'Invalid (End time before Start time)';
-                    nextButton.classList.add('disabled');
-                    nextButton.disabled = true;
-                    return;
-                }
-
-                const durationMs = endDate - startDate;
-                const durationMinutes = Math.floor(durationMs / (1000 * 60));
-                durationDisplay.textContent = `${durationMinutes} minutes`;
-            } else {
-                selectedTimeRangeDisplay.textContent = 'Not selected';
-                durationDisplay.textContent = '0 minutes';
-            }
-            updateNextButtonState();
-        }
-
-        /**
-         * Formats a 24-hour time string (HH:MM) to 12-hour format (h:mm AM/PM).
-         * @param {string} timeString - The time string in HH:MM format.
-         * @returns {string} The formatted time string.
-         */
-        function formatTime(timeString) {
-            const [hour, minute] = timeString.split(':').map(Number);
-            const date = new Date();
-            date.setHours(hour, minute);
-            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-        }
-
-        /**
-         * Checks if a date and valid time range are selected and enables/disables the next button.
-         */
-        function updateNextButtonState() {
-            const isDateSelected = selectedDate !== null;
-            const isStartTimeSelected = startTimeInput.value !== '';
-            const isEndTimeSelected = endTimeInput.value !== '';
-
-            let isTimeRangeValid = false;
-            if (isStartTimeSelected && isEndTimeSelected) {
-                const [startHour, startMinute] = startTimeInput.value.split(':').map(Number);
-                const [endHour, endMinute] = endTimeInput.value.split(':').map(Number);
-                
-                const startTimeInMinutes = startHour * 60 + startMinute;
-                const endTimeInMinutes = endHour * 60 + endMinute;
-
-                // Check if end time is strictly after start time
-                if (endTimeInMinutes > startTimeInMinutes) {
-                    isTimeRangeValid = true;
-                }
-            }
-
-            if (isDateSelected && isTimeRangeValid) {
-                nextButton.classList.remove('disabled');
-                nextButton.disabled = false;
-            } else {
-                nextButton.classList.add('disabled');
-                nextButton.disabled = true;
-            }
-        }
-
-        /**
-         * Clears all date and time selections and resets the display.
-         */
-        function clearSelection() {
-            // Clear selected date
-            const previouslySelected = dateGrid.querySelector('.date-cell.selected');
-            if (previouslySelected) {
-                previouslySelected.classList.remove('selected');
-            }
-            selectedDate = null;
-            selectedDateDisplay.textContent = 'None';
-            selectedDateInput.value = ''; // Clear hidden input
-
-            // Clear selected time
-            startTimeInput.value = '';
-            endTimeInput.value = '';
-            selectedTimeRangeDisplay.textContent = 'Not selected';
-            durationDisplay.textContent = '0 minutes';
-
-            updateNextButtonState(); // Update button state after clearing
-        }
-
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            renderCalendar(); // Initial calendar render
-            updateTimeDisplay(); // Initial time display update
-            updateNextButtonState(); // Initial button state update
-        });
-
-        prevMonthBtn.addEventListener('click', () => {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            renderCalendar();
-        });
-
-        nextMonthBtn.addEventListener('click', () => {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            renderCalendar();
-        });
-
-        startTimeInput.addEventListener('change', updateTimeDisplay);
-        endTimeInput.addEventListener('change', updateTimeDisplay);
-
-        startTimeInput.addEventListener('input', updateTimeDisplay);
-        endTimeInput.addEventListener('input', updateTimeDisplay);
-
-
-        clearSelectionBtn.addEventListener('click', clearSelection);
-    </script>
-
-</body>
-</html>
+{% endblock %}
