@@ -44,6 +44,7 @@ class Booking(db.Model):
    department_id = db.Column(db.Integer,db.ForeignKey('department.id'),nullable=False)
    startDatetime = db.Column(db.DateTime,nullable=False)
    endDatetime = db.Column(db.DateTime,nullable=False)
+   pennding_delete = db.Column(db.Boolean,default=False)
 
    user = db.relationship('User', backref='bookings', lazy=True)
    hall = db.relationship('Hall', backref='bookings', lazy=True)
@@ -286,8 +287,16 @@ def book():
    return render_template('book.html',datas =data)
 
 #Keep in mind this was genarated by Ai that means you sucked and need to be better.
-@app.route('/view-bookings')
+@app.route('/view-bookings',methods=['GET', 'POST'])
 def view_bookings():
+    
+   if request.method == 'POST':
+    pass
+
+
+
+
+    current_datetime = datetime.now()
     if 'user' in session:
        user_id = User.query.filter_by(username=session.get('user')).one_or_none().id
     else:
@@ -304,14 +313,14 @@ def view_bookings():
             db.joinedload(Booking.year),
             db.joinedload(Booking.department),
             db.joinedload(Booking.user)
-        ).filter(Booking.user_id == user_id)\
+        ).filter(Booking.user_id == user_id,Booking.endDatetime > current_datetime)\
          .order_by(Booking.startDatetime).all()
         other_bookings = Booking.query.options(
             db.joinedload(Booking.hall),
             db.joinedload(Booking.year),
             db.joinedload(Booking.department),
             db.joinedload(Booking.user)
-        ).filter(Booking.user_id != user_id)\
+        ).filter(Booking.user_id != user_id,Booking.endDatetime > current_datetime)\
          .order_by(Booking.startDatetime).all()
         
         return render_template('view_bookings.html', 
@@ -332,7 +341,7 @@ def view_bookings():
                 db.joinedload(Booking.user)
             ).filter(
                 Booking.department_id == selected_department_id,
-                Booking.year_id == selected_year_id
+                Booking.year_id == selected_year_id,Booking.endDatetime > current_datetime
             ).order_by(Booking.startDatetime).all()
             
             selected_department = Department.query.get(selected_department_id)

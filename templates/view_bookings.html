@@ -4,109 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Bookings</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .form-section {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        select, button {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        select {
-            width: 200px;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-        }
-        .btn-secondary:hover {
-            background-color: #545b62;
-        }
-        .bookings-section {
-            margin-top: 20px;
-        }
-        .section-title {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            margin: 20px 0 10px 0;
-            border-radius: 5px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .user-bookings {
-            background-color: #d4edda;
-            border-left: 4px solid #28a745;
-        }
-        .other-bookings {
-            background-color: #f8f9fa;
-            border-left: 4px solid #6c757d;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f8f9fa;
-            font-weight: bold;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        .no-bookings {
-            text-align: center;
-            color: #6c757d;
-            font-style: italic;
-            padding: 20px;
-        }
-        .selected-info {
-            background-color: #e7f3ff;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border-left: 4px solid #007bff;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/view_bookings.css') }}">
 </head>
 <body>
     <div class="container">
@@ -141,6 +39,9 @@
                             <td>{{ booking.year.year if booking.year else 'N/A' }}</td>
                             <td>{{ booking.startDatetime.strftime('%Y-%m-%d %H:%M') if booking.startDatetime else 'N/A' }}</td>
                             <td>{{ booking.endDatetime.strftime('%Y-%m-%d %H:%M') if booking.endDatetime else 'N/A' }}</td>
+                            <td>
+                                <button value="{{booking.booking_session}}" id="{{booking.user.id}}">Delete</button>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -161,7 +62,6 @@
                             <th>Year</th>
                             <th>Start Date & Time</th>
                             <th>End Date & Time</th>
-                            <th>Session</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -235,5 +135,7 @@
             {% endif %}
         {% endif %}
     </div>
+
+    <script></script>
 </body>
 </html>
