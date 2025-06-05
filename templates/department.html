@@ -43,6 +43,7 @@
         </div>
 
         <div class="submit-section">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="submit" value="Submit" class="submit-btn">
         </div>
     </form>

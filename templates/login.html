@@ -40,6 +40,7 @@
                     <a href="#" class="forgot-password">Forgot password?</a>
                 </div>
                 
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="submit" class="signin-btn" value="Sign In">
             </form>          
 

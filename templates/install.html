@@ -1,29 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>install</title>
-</head>
-<body>
-    <table>
-        <form action="" method="post">
-            <tr>
-                <td>Username:</td>
-                <td><input type="text" name="username"></td>
-            </tr>
-            <tr>
-                <td>Password:</td>
-                <td><input type="password" name="password"></td>
-            </tr>
-            <tr>
-                <td>AdminPass:</td>
-                <td><input type="text" name="adminpass"></td>
-            </tr>
-            <tr>
-                <td><input type="submit" value="Install"></td>
-            </tr>
+{% extends "base.html" %}
+{% block title %}Install - Booking System{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/install.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="install-container">
+    <div class="install-card">
+        <div class="install-header">
+            <h1>System Installation</h1>
+            <p>Set up your booking system by creating an admin account</p>
+        </div>
+        
+        <form action="" method="post" class="install-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Enter admin username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Enter secure password">
+            </div>
+            
+            <div class="form-group">
+                <label for="adminpass">Admin Passphrase</label>
+                <input type="password" id="adminpass" name="adminpass" required 
+                       placeholder="Enter admin passphrase">
+                <small class="form-hint">This will be used for system administration</small>
+            </div>
+            
+            <button type="submit" class="install-btn">
+                <span>Complete Installation</span>
+            </button>
         </form>
-    </table>
-</body>
-</html>
+        
+        <div class="install-footer">
+            <p>Make sure to remember your credentials - they cannot be recovered!</p>
+        </div>
+    </div>
+</div>
+
+<style>
+
+</style>
+{% endblock %}

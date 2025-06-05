@@ -24,6 +24,7 @@
                         <h3>Add Department</h3>
                         <form action="" method="post">
                             <input type="hidden" name="action" value="add_department">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="form-group">
                                 <label for="facultyName">Department Name:</label>
                                 <input type="text" id="facultyName" name="name" required>
@@ -35,6 +36,7 @@
                         <h3>Delete Department</h3>
                         <form action="" method="post">
                             <input type="hidden" name="action" value="delete_department">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="form-group">
                                 <label for="deleteFaculty">Select Department to Delete:</label>
                                 <select id="deleteFaculty" name="department" required>
@@ -62,6 +64,7 @@
                         <h3>Add Year</h3>
                         <form action="" method="post">
                             <input type="hidden" name="action" value="add_year">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="form-group">
                                 <label for="department">Select Department:</label>
                                 <select id="department" name="department" required>
@@ -81,6 +84,7 @@
                         <h3>Delete Year</h3>
                         <form action="/admin" method="post">
                             <input type="hidden" name="action" value="delete_year">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="form-group">
                                 <label for="deleteYearDepartment">Select Department:</label>
                                 <select id="deleteYearDepartment" name="faculty" required>
@@ -114,6 +118,7 @@
                         <h3>Add Hall</h3>
                         <form action="/admin" method="post">
                             <input type="hidden" name="action" value="add_hall">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="form-group">
                                 <label for="hallName">Hall Name:</label>
                                 <input type="text" id="hallName" name="name" required>
@@ -132,6 +137,7 @@
                         <h3>Delete Hall</h3>
                         <form action="/admin" method="post">
                             <input type="hidden" name="action" value="delete_hall">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="form-group">
                                 <label for="deleteHall">Select Hall to Delete:</label>
                                 <select id="deleteHall" name="deleteHall" required>
@@ -159,6 +165,7 @@
                         <h3>Add Lecture</h3>
                         <form action="/admin" method="post">
                             <input type="hidden" name="action" value="add_lecture">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="form-group">
                                 <label for="name">Name:</label>
                                 <input type="text" id="name" name="name" required>
@@ -178,6 +185,7 @@
                         <h3>Delete Teacher</h3>
                         <form action="/admin" method="post">
                             <input type="hidden" name="action" value="delete_lecture">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="form-group">
                                 <label for="deleteTeacher">Select Teacher to Delete:</label>
                                 <input type="text" id="deleteTeacher" name="username" required>

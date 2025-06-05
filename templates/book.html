@@ -7,10 +7,8 @@
 </head>
 <body>
     <form action="" method="post">
-        {% for data in datas %}
-        <p>{{data.selected_department}}</p>
-        {% endfor %}
 
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="submit" value="Book Now">
     </form>
 </body>

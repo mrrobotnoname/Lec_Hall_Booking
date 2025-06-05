@@ -4,85 +4,247 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture Hall Selection</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Light gray background */
+            background-color: #f3f4f6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
         }
-        /* Custom styles for selected hall button */
+
+        .selection-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 64rem;
+        }
+
+        .back-button {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            transition: color 0.2s ease;
+        }
+
+        .back-button:hover {
+            color: #1d4ed8;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 2rem;
+        }
+
+        .hall-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .hall-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .hall-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .hall-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .hall-options {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        .hall-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            color: #374151;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-family: inherit;
+            font-size: 0.875rem;
+        }
+
+        .hall-btn:hover {
+            background-color: #f9fafb;
+            border-color: #60a5fa;
+        }
+
         .hall-btn.selected {
-            background-color: #3b82f6; /* Blue background for selected */
+            background-color: #3b82f6;
             color: white;
             border-color: #3b82f6;
             box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
         }
-        /* New rule: Style for selected hall button on hover */
+
         .hall-btn.selected:hover {
-            background-color: #2563eb; /* A slightly darker blue for hover */
-            color: #e0f2fe; /* A very light blue/off-white for text on hover */
+            background-color: #2563eb;
+            color: #e0f2fe;
         }
-        /* Style for disabled next button */
-        .next-button.disabled {
+
+        .no-halls-message {
+            text-align: center;
+            color: #6b7280;
+            font-size: 1.125rem;
+        }
+
+        .selection-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .selection-display p {
+            color: #374151;
+        }
+
+        .selection-display .font-semibold {
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .next-button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .next-button:hover:not(:disabled) {
+            background-color: #2563eb;
+        }
+
+        .next-button:disabled {
             cursor: not-allowed;
             opacity: 0.5;
         }
+
+        @media (max-width: 640px) {
+            .selection-container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .selection-footer {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
-
-    <div class="selection-container bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl">
-        <a href="date.html" class="back-button text-blue-600 hover:text-blue-800 text-sm font-medium mb-6 inline-block">← Back To Date & Time Selection</a>
+<body>
+    <div class="selection-container">
+        <a href="date.html" class="back-button">← Back To Date & Time Selection</a>
         
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Select Lecture Hall</h1>
+        <h1>Select Lecture Hall</h1>
         
         <form id="hallSelectionForm" action="" method="post">
             <input type="hidden" name="selectedHallId" id="selectedHallId">
 
             <div id="halls-container">
-                {# Initialize a dictionary to group halls by derived building name #}
-                {% set grouped_halls = {} %}
+                {# Initialize dictionaries to separate lecture halls and laboratories #}
+                {% set lecture_halls_by_building = {} %}
+                {% set laboratories = [] %}
 
-                {# Loop through all halls passed from the backend #}
+                {# Loop through all halls and separate by hallType #}
                 {% for hall in halls %}
-
-                        {% set building_prefix = hall.hallName[0] %}
-                        {% if building_prefix == 'L' %}
-                            {% set building_name = 'Laboratories' %}
-                        {% else %}
-                            {% set building_name = building_prefix + ' Building' %}
+                    {% if hall.hallType.lower() == 'lecture hall' %}
+                        {# Group lecture halls by building #}
+                        {% set building_prefix = hall.hallName[0].upper() %}
+                        {% set building_name = building_prefix + ' Building' %}
+                        
+                        {% if building_name not in lecture_halls_by_building %}
+                            {% set _ = lecture_halls_by_building.update({building_name: []}) %}
                         {% endif %}
-
-                        {% if building_name not in grouped_halls %}
-                            {% set _ = grouped_halls.update({building_name: []}) %}
-                        {% endif %}
-                        {% set _ = grouped_halls[building_name].append(hall) %}
+                        {% set _ = lecture_halls_by_building[building_name].append(hall) %}
+                    {% elif hall.hallType.lower() == 'laboratory' or hall.hallType.lower() == 'lab' %}
+                        {# Keep all laboratories together #}
+                        {% set _ = laboratories.append(hall) %}
+                    {% endif %}
                 {% endfor %}
 
-                {% if grouped_halls %}
-                    {% for building, halls_in_building in grouped_halls.items() %}
-                        <div class="hall-section mb-6">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ building }}</h2>
-                            <div class="hall-options grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                                {% for hall in halls_in_building %}
-                                    <button type="button" class="hall-btn px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 hover:border-blue-400 transition-all duration-200 ease-in-out" data-hall-id="{{ hall.id }}" data-hall-name="{{ hall.hallName }}">
-                                        {{ hall.hallName }}
-                                    </button>
-                                {% endfor %}
-                            </div>
+                {# Display Lecture Halls grouped by building #}
+                {% for building_name, halls_list in lecture_halls_by_building.items() %}
+                    <div class="hall-section">
+                        <h2>{{ building_name }} - Lecture Halls</h2>
+                        <div class="hall-options">
+                            {% for hall in halls_list %}
+                                <button type="button" class="hall-btn" data-hall-id="{{ hall.id }}" data-hall-name="{{ hall.hallName }}" data-hall-type="{{ hall.hallType }}">
+                                    {{ hall.hallName }}
+                                </button>
+                            {% endfor %}
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-center text-gray-500 text-lg">No available halls found for booking.</p>
+                    </div>
+                {% endfor %}
+
+                {# Display all Laboratories together #}
+                {% if laboratories %}
+                    <div class="hall-section">
+                        <h2>Laboratories</h2>
+                        <div class="hall-options">
+                            {% for hall in laboratories %}
+                                <button type="button" class="hall-btn" data-hall-id="{{ hall.id }}" data-hall-name="{{ hall.hallName }}" data-hall-type="{{ hall.hallType }}">
+                                    {{ hall.hallName }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# Show message if no halls available #}
+                {% if not lecture_halls_by_building and not laboratories %}
+                    <p class="no-halls-message">No available halls found for booking.</p>
                 {% endif %}
             </div>
             
-            <div class="selection-footer flex justify-between items-center mt-8 pt-4 border-t border-gray-200">
+            <div class="selection-footer">
                 <div class="selection-display">
-                    <p class="text-gray-700">Selected Hall: <span id="selected-hall" class="font-semibold text-blue-600">None</span></p>
+                    <p>Selected Hall: <span id="selected-hall" class="font-semibold">None</span></p>
                 </div>
-                <button type="submit" id="next-button" class="next-button bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 cursor-not-allowed opacity-50" disabled>Next</button>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" id="next-button" class="next-button" disabled>Next</button>
             </div>
         </form>
     </div>
@@ -95,7 +257,7 @@
             const nextButton = $('#next-button');
             const hallsContainer = $('#halls-container');
 
-            // Event delegation for hall button clicks (works for dynamically added buttons)
+            // Event delegation for hall button clicks
             hallsContainer.on('click', '.hall-btn', function() {
                 // Remove 'selected' class from all buttons
                 $('.hall-btn').removeClass('selected');
@@ -105,18 +267,18 @@
                 // Get the hall ID and name from data attributes
                 const hallId = $(this).data('hall-id');
                 const hallName = $(this).data('hall-name');
+                const hallType = $(this).data('hall-type');
 
                 // Update the hidden input and display span
                 selectedHallIdInput.val(hallId);
-                selectedHallDisplay.text(hallName);
+                selectedHallDisplay.text(hallName + ' (' + hallType + ')');
 
                 // Enable the "Next" button
-                nextButton.prop('disabled', false).removeClass('cursor-not-allowed opacity-50').addClass('cursor-pointer');
+                nextButton.prop('disabled', false);
             });
 
-            // Optional: If you want to pre-select a hall based on a value from backend
-            // This would require passing 'initial_hall_id' from Flask to a JavaScript variable.
-            // For example: const initialSelectedHallId = "{{ initial_hall_id | default('') }}";
+            // Optional: Pre-select a hall based on backend value
+            // const initialSelectedHallId = "{{ initial_hall_id | default('') }}";
             // if (initialSelectedHallId) {
             //     $(`.hall-btn[data-hall-id="${initialSelectedHallId}"]`).click();
             // }

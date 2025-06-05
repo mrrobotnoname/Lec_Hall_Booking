@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Bookings</title>
+{% extends "base.html" %}
+{% block title %}View Bookings{% endblock %}
+{%block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/view_bookings.css') }}">
-</head>
-<body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+{% endblock %}
+{% block content %}
     <div class="container">
         <h1>Hall Bookings</h1>
         <a href="{{ url_for('root') }}">Return Home</a>
@@ -40,7 +38,12 @@
                             <td>{{ booking.startDatetime.strftime('%Y-%m-%d %H:%M') if booking.startDatetime else 'N/A' }}</td>
                             <td>{{ booking.endDatetime.strftime('%Y-%m-%d %H:%M') if booking.endDatetime else 'N/A' }}</td>
                             <td>
-                                <button value="{{booking.booking_session}}" id="{{booking.user.id}}">Delete</button>
+                                {% if booking.pennding_delete == false %}
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button value="{{booking.booking_session}}" id="{{booking.user.id}}" class="delete-booking-btn">Delete</button>
+                                {% else %}
+                                <button class="delete-booking-btn" disabled style="background-color: #dc3545;">Pending Deletion</button>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -136,6 +139,40 @@
         {% endif %}
     </div>
 
-    <script></script>
-</body>
-</html>
+<script>
+$(document).ready(function() {
+    $('.delete-booking-btn').on('click', function() {
+        var bookingSession = $(this).val();
+        var userId = $(this).attr('id');
+        var button = $(this);
+        
+        if (!confirm('Are you sure you want to mark this booking for deletion?')) {
+            return;
+        }
+        
+        $.ajax({
+            url: '/view-bookings',
+            type: 'POST',
+            data: {
+                'booking_session': bookingSession,
+                'user_id': userId,
+                'csrf_token': $('[name=csrf_token]').val()  // Flask-WTF token
+            },
+            success: function(response) {
+                if (response.success,200) {
+                    button.text('Pending Deletion');
+                    button.prop('disabled', true);
+                    button.css('background-color', '#dc3545');
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                alert('An error occurred while processing the request');
+            }
+        });
+    });
+});
+    </script>
+{% endblock %}

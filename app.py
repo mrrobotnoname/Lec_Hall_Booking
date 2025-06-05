@@ -1,15 +1,17 @@
-from flask import Flask,render_template,session,request,redirect,flash,url_for,abort
-from flask_sqlalchemy import SQLAlchemy      
+from flask import Flask,render_template,session,request,redirect,flash,url_for,abort,jsonify
+from flask_sqlalchemy import SQLAlchemy  
+from flask_wtf.csrf import CSRFProtect    
 from datetime import datetime
 from hashlib import sha256
 
 
 
 app = Flask(__name__)
-app.secret_key = "ammoeka"
-adminpass = "Ammoeka"
+app.secret_key = "the_secret_key12345"
+adminpass = "adminpass123"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
 
 
  
@@ -289,19 +291,31 @@ def book():
 #Keep in mind this was genarated by Ai that means you sucked and need to be better.
 @app.route('/view-bookings',methods=['GET', 'POST'])
 def view_bookings():
-    
-   if request.method == 'POST':
-    pass
+    if request.method == 'POST':
+      print(request.form.get('user_id'))
 
-
-
-
+      user = User.query.filter_by(id = int(request.form.get('user_id'))).one_or_none()
+      bkSession = request.form.get('booking_session')
+      if user:
+         if session['user']== user.username:
+            bookings = Booking.query.filter_by(booking_session=bkSession).first()
+            if bookings:
+               bookings.pennding_delete = True
+               db.session.commit()
+               flash("Booking marked for deletion", category="success")
+               return redirect(url_for('view_bookings'))
+         else:
+            flash("You can only delete your own bookings", category="warning")
+            return redirect(url_for('view_bookings'))
+      flash("User not found", category="error")
+      return redirect(url_for('view_bookings'))
+       
     current_datetime = datetime.now()
     if 'user' in session:
        user_id = User.query.filter_by(username=session.get('user')).one_or_none().id
     else:
          user_id = None
-    if user_id:
+    if user_id is not None:
         current_user = User.query.get(user_id)
         
         if not current_user:
@@ -327,7 +341,7 @@ def view_bookings():
                              user_bookings=user_bookings,
                              other_bookings=other_bookings,
                              current_user=current_user,
-                             is_logged_in=True)
+                                is_logged_in=True)
     
     else:
         selected_department_id = session.get('selected_department')
@@ -365,31 +379,31 @@ def clear_selection():
     return redirect(url_for('view_bookings'))
 
 # Additional Flask-SQLAlchemy helper functions
-def get_safe_bookings_query():
-    """
-    Helper function to get bookings with safe joins to avoid None errors
-    Uses Flask-SQLAlchemy's query builder with proper error handling
-    """
-    return Booking.query.options(
-        db.joinedload(Booking.hall),
-        db.joinedload(Booking.year),
-        db.joinedload(Booking.department),
-        db.joinedload(Booking.user)
-    ).join(User, Booking.user_id == User.id)\
-     .join(Hall, Booking.hall_id == Hall.id)\
-     .join(Year, Booking.year_id == Year.id)\
-     .join(Department, Booking.department_id == Department.id)
+# def get_safe_bookings_query():
+#     """
+#     Helper function to get bookings with safe joins to avoid None errors
+#     Uses Flask-SQLAlchemy's query builder with proper error handling
+#     """
+#     return Booking.query.options(
+#         db.joinedload(Booking.hall),
+#         db.joinedload(Booking.year),
+#         db.joinedload(Booking.department),
+#         db.joinedload(Booking.user)
+#     ).join(User, Booking.user_id == User.id)\
+#      .join(Hall, Booking.hall_id == Hall.id)\
+#      .join(Year, Booking.year_id == Year.id)\
+#      .join(Department, Booking.department_id == Department.id)
 
-def validate_booking_relationships():
-    """
-    Helper function to check for orphaned bookings (useful for debugging)
-    """
-    orphaned_bookings = db.session.query(Booking.booking_session).outerjoin(
-        User, Booking.user_id == User.id
-    ).filter(User.id.is_(None)).all()
+# def validate_booking_relationships():
+#     """
+#     Helper function to check for orphaned bookings (useful for debugging)
+#     """
+#     orphaned_bookings = db.session.query(Booking.booking_session).outerjoin(
+#         User, Booking.user_id == User.id
+#     ).filter(User.id.is_(None)).all()
     
-    if orphaned_bookings:
-        print(f"Warning: Found {len(orphaned_bookings)} bookings with invalid user references")
+#     if orphaned_bookings:
+#         print(f"Warning: Found {len(orphaned_bookings)} bookings with invalid user references")
     
     return len(orphaned_bookings) == 0
 
